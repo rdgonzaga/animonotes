@@ -33,7 +33,6 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
 - **Auth**: Auth.js v5 (next-auth@beta)
 - **UI**: TailwindCSS v4 + shadcn/ui
 - **Editor**: Tiptap with extensions
-- **Testing**: Vitest + Playwright
 - **Icons**: Lucide React
 
 ## 🚀 Getting Started
@@ -191,15 +190,9 @@ src/
     └── validations/       # Zod schemas
 ```
 
-## 🧪 Testing
+## 🧰 Scripts
 
 ```bash
-# Run unit tests
-npm run test
-
-# Run E2E tests
-npm run test:e2e
-
 # Run linter
 npm run lint
 
