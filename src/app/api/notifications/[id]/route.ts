@@ -5,8 +5,9 @@ import { auth } from "@/lib/auth";
 // PATCH /api/notifications/[id] - Mark notification as read
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -18,7 +19,7 @@ export async function PATCH(
     }
 
     const notification = await prisma.notification.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!notification) {
@@ -36,7 +37,7 @@ export async function PATCH(
     }
 
     const updated = await prisma.notification.update({
-      where: { id: params.id },
+      where: { id: id },
       data: { read: true },
     });
 
@@ -53,8 +54,9 @@ export async function PATCH(
 // DELETE /api/notifications/[id] - Delete notification
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -66,7 +68,7 @@ export async function DELETE(
     }
 
     const notification = await prisma.notification.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!notification) {
@@ -84,7 +86,7 @@ export async function DELETE(
     }
 
     await prisma.notification.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ message: "Notification deleted" });

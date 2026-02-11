@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TiptapEditor } from "@/components/editor/tiptap-editor";
-import { AnonDisclaimer } from "@/components/anonymous/anon-disclaimer";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TiptapEditor } from '@/components/editor/tiptap-editor';
+import { AnonDisclaimer } from '@/components/anonymous/anon-disclaimer';
 
 export default function NewAnonymousPostPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<any[]>([]);
   const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    categoryId: "",
+    title: '',
+    content: '',
+    categoryId: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch("/api/categories")
+    fetch('/api/categories')
       .then((res) => res.json())
       .then((data) => {
         setCategories(data);
@@ -33,19 +33,19 @@ export default function NewAnonymousPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setLoading(true);
 
     try {
-      const response = await fetch("/api/anonymous/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/anonymous/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || "Failed to create anonymous post");
+        setError(data.error || 'Failed to create anonymous post');
         setLoading(false);
         return;
       }
@@ -53,20 +53,21 @@ export default function NewAnonymousPostPage() {
       const post = await response.json();
       router.push(`/anonymous/${post.id}`);
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError('An unexpected error occurred');
       setLoading(false);
     }
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-4xl mx-auto w-full py-8 px-4">
       <AnonDisclaimer />
 
       <Card>
         <CardHeader>
           <CardTitle>Ask Anonymously</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Your identity will never be stored. Only you can edit/delete this post (via browser cookies).
+            Your identity will never be stored. Only you can edit/delete this post (via browser
+            cookies).
           </p>
         </CardHeader>
         <CardContent>
@@ -78,9 +79,7 @@ export default function NewAnonymousPostPage() {
                 type="text"
                 placeholder="What's your question?"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
               />
             </div>
@@ -89,11 +88,9 @@ export default function NewAnonymousPostPage() {
               <Label htmlFor="category">Category</Label>
               <select
                 id="category"
-                className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md"
                 value={formData.categoryId}
-                onChange={(e) =>
-                  setFormData({ ...formData, categoryId: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
               >
                 {categories.map((cat) => (
@@ -108,28 +105,22 @@ export default function NewAnonymousPostPage() {
               <Label>Details</Label>
               <TiptapEditor
                 content={formData.content}
-                onChange={(content) =>
-                  setFormData({ ...formData, content })
-                }
+                onChange={(content) => setFormData({ ...formData, content })}
                 placeholder="Provide more details about your question..."
               />
             </div>
 
             {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
                 {error}
               </div>
             )}
 
             <div className="flex gap-2">
               <Button type="submit" disabled={loading}>
-                {loading ? "Posting..." : "Post Anonymously"}
+                {loading ? 'Posting...' : 'Post Anonymously'}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-              >
+              <Button type="button" variant="outline" onClick={() => router.back()}>
                 Cancel
               </Button>
             </div>

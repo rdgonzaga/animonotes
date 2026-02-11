@@ -5,11 +5,12 @@ import { auth } from "@/lib/auth";
 // GET /api/users/[id] - Get user profile
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: {
         id: true,
         name: true,
@@ -34,7 +35,7 @@ export async function GET(
 
     // Calculate karma (simplified: upvotes on user's posts and comments)
     const userPosts = await prisma.post.findMany({
-      where: { authorId: params.id },
+      where: { authorId: id },
       select: {
         votes: {
           select: { value: true },
@@ -43,7 +44,7 @@ export async function GET(
     });
 
     const userComments = await prisma.comment.findMany({
-      where: { authorId: params.id },
+      where: { authorId: id },
       select: {
         votes: {
           select: { value: true },
@@ -72,8 +73,9 @@ export async function GET(
 // PATCH /api/users/[id] - Update user profile
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -84,7 +86,7 @@ export async function PATCH(
       );
     }
 
-    if (session.user.id !== params.id) {
+    if (session.user.id !== id) {
       return NextResponse.json(
         { error: "Forbidden - can only edit own profile" },
         { status: 403 }
@@ -95,7 +97,7 @@ export async function PATCH(
     const { name, image } = body;
 
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(name && { name }),
         ...(image && { image }),
@@ -121,8 +123,9 @@ export async function PATCH(
 // DELETE /api/users/[id] - Soft delete user account
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -133,7 +136,7 @@ export async function DELETE(
       );
     }
 
-    if (session.user.id !== params.id) {
+    if (session.user.id !== id) {
       return NextResponse.json(
         { error: "Forbidden - can only delete own account" },
         { status: 403 }
@@ -142,10 +145,10 @@ export async function DELETE(
 
     // Soft delete user
     await prisma.user.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         deletedAt: new Date(),
-        email: `deleted_${params.id}@deleted.com`, // Anonymize email
+        email: `deleted_${id}@deleted.com`, // Anonymize email
         name: "[Deleted User]",
         image: null,
       },
@@ -153,13 +156,13 @@ export async function DELETE(
 
     // Anonymize posts (keep content, remove author link)
     await prisma.post.updateMany({
-      where: { authorId: params.id },
+      where: { authorId: id },
       data: { authorId: null },
     });
 
     // Anonymize comments (keep content, remove author link)
     await prisma.comment.updateMany({
-      where: { authorId: params.id },
+      where: { authorId: id },
       data: { authorId: null },
     });
 

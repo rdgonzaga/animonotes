@@ -5,8 +5,9 @@ import { auth } from "@/lib/auth";
 // POST /api/posts/[id]/bookmark - Add bookmark
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -19,7 +20,7 @@ export async function POST(
 
     // Check if post exists
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!post || post.deletedAt) {
@@ -34,7 +35,7 @@ export async function POST(
       where: {
         userId_postId: {
           userId: session.user.id,
-          postId: params.id,
+          postId: id,
         },
       },
     });
@@ -50,7 +51,7 @@ export async function POST(
     const bookmark = await prisma.bookmark.create({
       data: {
         userId: session.user.id,
-        postId: params.id,
+        postId: id,
       },
     });
 
@@ -67,8 +68,9 @@ export async function POST(
 // DELETE /api/posts/[id]/bookmark - Remove bookmark
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -82,7 +84,7 @@ export async function DELETE(
     await prisma.bookmark.deleteMany({
       where: {
         userId: session.user.id,
-        postId: params.id,
+        postId: id,
       },
     });
 
