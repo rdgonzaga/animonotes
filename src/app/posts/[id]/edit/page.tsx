@@ -1,41 +1,41 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TiptapEditor } from "@/components/editor/tiptap-editor";
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter, useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TiptapEditor } from '@/components/editor/tiptap-editor';
 
 export default function EditPostPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
   const postId = params.id as string;
-  
+
   const [categories, setCategories] = useState<any[]>([]);
   const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    categoryId: "",
+    title: '',
+    content: '',
+    categoryId: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
+    if (status === 'unauthenticated') {
+      router.push('/login');
       return;
     }
 
-    if (status === "authenticated") {
+    if (status === 'authenticated') {
       // Fetch post and categories
       Promise.all([
         fetch(`/api/posts/${postId}`).then((res) => res.json()),
-        fetch("/api/categories").then((res) => res.json()),
+        fetch('/api/categories').then((res) => res.json()),
       ]).then(([post, cats]) => {
         if (post.authorId !== session.user.id) {
           router.push(`/posts/${postId}`);
@@ -54,26 +54,26 @@ export default function EditPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setSaving(true);
 
     try {
       const response = await fetch(`/api/posts/${postId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || "Failed to update post");
+        setError(data.error || 'Failed to update post');
         setSaving(false);
         return;
       }
 
       router.push(`/posts/${postId}`);
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError('An unexpected error occurred');
       setSaving(false);
     }
   };
@@ -83,7 +83,7 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-4xl mx-auto w-full py-8 px-4">
       <Card>
         <CardHeader>
           <CardTitle>Edit Post</CardTitle>
@@ -105,7 +105,7 @@ export default function EditPostPage() {
               <Label htmlFor="category">Category</Label>
               <select
                 id="category"
-                className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md"
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
@@ -127,14 +127,14 @@ export default function EditPostPage() {
             </div>
 
             {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
                 {error}
               </div>
             )}
 
             <div className="flex gap-2">
               <Button type="submit" disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? 'Saving...' : 'Save Changes'}
               </Button>
               <Button
                 type="button"

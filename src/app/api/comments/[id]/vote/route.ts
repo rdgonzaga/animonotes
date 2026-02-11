@@ -6,8 +6,9 @@ import { sseBroadcaster } from "@/lib/sse-broadcaster";
 // POST /api/comments/[id]/vote - Vote on comment
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -30,7 +31,7 @@ export async function POST(
 
     // Check if comment exists
     const comment = await prisma.comment.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!comment || comment.deletedAt) {
@@ -45,7 +46,7 @@ export async function POST(
       where: {
         userId_commentId: {
           userId: session.user.id,
-          commentId: params.id,
+          commentId: id,
         },
       },
     });
@@ -53,7 +54,7 @@ export async function POST(
     // Calculate new score after vote change
     const calculateNewScore = async () => {
       const votes = await prisma.vote.findMany({
-        where: { commentId: params.id },
+        where: { commentId: id },
         select: { value: true },
       });
       return votes.reduce((sum, vote) => sum + vote.value, 0);
@@ -68,7 +69,7 @@ export async function POST(
           where: {
             userId_commentId: {
               userId: session.user.id,
-              commentId: params.id,
+              commentId: id,
             },
           },
         });
@@ -78,7 +79,7 @@ export async function POST(
         sseBroadcaster.broadcast({
           type: 'vote-update',
           data: {
-            targetId: params.id,
+            targetId: id,
             targetType: 'comment',
             score: newScore,
             userId: session.user.id,
@@ -93,7 +94,7 @@ export async function POST(
           where: {
             userId_commentId: {
               userId: session.user.id,
-              commentId: params.id,
+              commentId: id,
             },
           },
           data: { value },
@@ -104,7 +105,7 @@ export async function POST(
         sseBroadcaster.broadcast({
           type: 'vote-update',
           data: {
-            targetId: params.id,
+            targetId: id,
             targetType: 'comment',
             score: newScore,
             userId: session.user.id,
@@ -119,7 +120,7 @@ export async function POST(
       await prisma.vote.create({
         data: {
           userId: session.user.id,
-          commentId: params.id,
+          commentId: id,
           value,
         },
       });
@@ -129,7 +130,7 @@ export async function POST(
       sseBroadcaster.broadcast({
         type: 'vote-update',
         data: {
-          targetId: params.id,
+          targetId: id,
           targetType: 'comment',
           score: newScore,
           userId: session.user.id,
@@ -151,8 +152,9 @@ export async function POST(
 // DELETE /api/comments/[id]/vote - Remove vote
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -166,7 +168,7 @@ export async function DELETE(
     await prisma.vote.deleteMany({
       where: {
         userId: session.user.id,
-        commentId: params.id,
+        commentId: id,
       },
     });
 

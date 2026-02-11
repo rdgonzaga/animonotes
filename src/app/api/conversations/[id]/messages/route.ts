@@ -6,8 +6,9 @@ import { sendMessageSchema } from "@/lib/validations/message";
 // POST /api/conversations/[id]/messages - Send message
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -28,7 +29,7 @@ export async function POST(
 
     // Check if conversation exists and user is participant
     const conversation = await prisma.conversation.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         participants: true,
       },
@@ -73,7 +74,7 @@ export async function POST(
     // Create message
     const message = await prisma.message.create({
       data: {
-        conversationId: params.id,
+        conversationId: id,
         senderId: session.user.id,
         content,
       },

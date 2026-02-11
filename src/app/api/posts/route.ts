@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, content, categoryId, isAnonymous, image } = validation.data;
+    const { title, content, categoryId, isAnonymous } = validation.data;
 
     const post = await prisma.post.create({
       data: {
@@ -116,7 +116,6 @@ export async function POST(request: NextRequest) {
         categoryId,
         authorId: isAnonymous ? null : session.user.id,
         isAnonymous,
-        image,
       },
       include: {
         author: {

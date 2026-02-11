@@ -6,8 +6,9 @@ import { sseBroadcaster } from "@/lib/sse-broadcaster";
 // POST /api/posts/[id]/vote - Vote on post
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -30,7 +31,7 @@ export async function POST(
 
     // Check if post exists
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!post || post.deletedAt) {
@@ -45,7 +46,7 @@ export async function POST(
       where: {
         userId_postId: {
           userId: session.user.id,
-          postId: params.id,
+          postId: id,
         },
       },
     });
@@ -53,7 +54,7 @@ export async function POST(
     // Calculate new score after vote change
     const calculateNewScore = async () => {
       const votes = await prisma.vote.findMany({
-        where: { postId: params.id },
+        where: { postId: id },
         select: { value: true },
       });
       return votes.reduce((sum, vote) => sum + vote.value, 0);
@@ -68,7 +69,7 @@ export async function POST(
           where: {
             userId_postId: {
               userId: session.user.id,
-              postId: params.id,
+              postId: id,
             },
           },
         });
@@ -78,12 +79,12 @@ export async function POST(
         sseBroadcaster.broadcast({
           type: 'vote-update',
           data: {
-            targetId: params.id,
+            targetId: id,
             targetType: 'post',
             score: newScore,
             userId: session.user.id,
           },
-          channel: `post-${params.id}`,
+          channel: `post-${id}`,
         });
         
         return NextResponse.json({ message: "Vote removed", value: 0, score: newScore });
@@ -93,7 +94,7 @@ export async function POST(
           where: {
             userId_postId: {
               userId: session.user.id,
-              postId: params.id,
+              postId: id,
             },
           },
           data: { value },
@@ -104,12 +105,12 @@ export async function POST(
         sseBroadcaster.broadcast({
           type: 'vote-update',
           data: {
-            targetId: params.id,
+            targetId: id,
             targetType: 'post',
             score: newScore,
             userId: session.user.id,
           },
-          channel: `post-${params.id}`,
+          channel: `post-${id}`,
         });
         
         return NextResponse.json({ message: "Vote updated", value, score: newScore });
@@ -119,7 +120,7 @@ export async function POST(
       await prisma.vote.create({
         data: {
           userId: session.user.id,
-          postId: params.id,
+          postId: id,
           value,
         },
       });
@@ -129,12 +130,12 @@ export async function POST(
       sseBroadcaster.broadcast({
         type: 'vote-update',
         data: {
-          targetId: params.id,
+          targetId: id,
           targetType: 'post',
           score: newScore,
           userId: session.user.id,
         },
-        channel: `post-${params.id}`,
+        channel: `post-${id}`,
       });
       
       return NextResponse.json({ message: "Vote created", value, score: newScore });
@@ -151,8 +152,9 @@ export async function POST(
 // DELETE /api/posts/[id]/vote - Remove vote
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -166,7 +168,7 @@ export async function DELETE(
     await prisma.vote.deleteMany({
       where: {
         userId: session.user.id,
-        postId: params.id,
+        postId: id,
       },
     });
 

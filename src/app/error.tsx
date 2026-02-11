@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle, RotateCcw } from "lucide-react";
 
 export default function Error({
   error,
@@ -17,24 +17,23 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="container flex items-center justify-center min-h-screen py-8">
-      <Card className="max-w-md w-full">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-red-500" />
-            <CardTitle>Something went wrong!</CardTitle>
+    <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] py-8 px-4">
+      <Card className="max-w-md w-full text-center">
+        <CardContent className="pt-12 pb-10 space-y-6">
+          <AlertCircle className="h-16 w-16 text-destructive mx-auto" />
+          <div className="space-y-2">
+            <h1 className="font-serif text-2xl font-bold">Something went wrong</h1>
+            <p className="text-muted-foreground">
+              An error occurred while processing your request.
+            </p>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            An error occurred while processing your request.
-          </p>
           {error.message && (
-            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded text-sm text-red-600 dark:text-red-400">
+            <div className="bg-destructive/10 p-3 rounded-lg text-sm text-destructive text-left">
               {error.message}
             </div>
           )}
-          <Button onClick={reset} className="w-full">
+          <Button onClick={reset} className="gap-2">
+            <RotateCcw className="h-4 w-4" />
             Try again
           </Button>
         </CardContent>

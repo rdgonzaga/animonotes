@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 // GET /api/polls/[id]/results - Get poll results
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const poll = await prisma.poll.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         options: {
           include: {

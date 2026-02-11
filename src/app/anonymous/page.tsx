@@ -3,49 +3,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AnonPostCard } from '@/components/anonymous/anon-post-card';
 import { AnonDisclaimer } from '@/components/anonymous/anon-disclaimer';
+import { Shield, PenLine } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 async function getAnonymousPosts() {
   try {
+    const where = { deletedAt: null, isAnonymous: true, authorId: null };
+
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
-        where: {
-          deletedAt: null,
-          isAnonymous: true,
-          authorId: null,
-        },
+        where,
         include: {
-          category: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-            },
-          },
-          _count: {
-            select: {
-              comments: true,
-              votes: true,
-            },
-          },
+          category: { select: { id: true, name: true, slug: true } },
+          _count: { select: { comments: true, votes: true } },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: { createdAt: 'desc' },
         take: 10,
       }),
-      prisma.post.count({
-        where: {
-          deletedAt: null,
-          isAnonymous: true,
-          authorId: null,
-        },
-      }),
+      prisma.post.count({ where }),
     ]);
 
-    // Calculate vote scores
     const postsWithScores = await Promise.all(
       posts.map(async (post) => {
         const votes = await prisma.vote.findMany({
@@ -59,63 +38,61 @@ async function getAnonymousPosts() {
 
     return {
       posts: postsWithScores,
-      pagination: {
-        page: 1,
-        limit: 10,
-        total,
-        totalPages: Math.ceil(total / 10),
-      },
+      pagination: { page: 1, limit: 10, total, totalPages: Math.ceil(total / 10) },
     };
-  } catch (error) {
-    console.error('Anonymous posts fetch error:', error);
-    return {
-      posts: [],
-      pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
-    };
+  } catch {
+    return { posts: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } };
   }
 }
 
 export default async function AnonymousPage() {
   const { posts, pagination } = await getAnonymousPosts();
 
-  // Serialize dates for client components
-  const serializedPosts = posts.map((post) => ({
-    ...post,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
-    deletedAt: post.deletedAt ? post.deletedAt.toISOString() : null,
-  }));
-
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-4xl mx-auto w-full py-8 px-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Anonymous Q&A</h1>
-          <p className="text-muted-foreground mt-1">
-            Ask questions anonymously - your identity is never stored
+          <div className="flex items-center gap-3 mb-2">
+            <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold">Anonymous Q&amp;A</h1>
+          </div>
+          <span className="accent-line mt-2" />
+          <p className="text-muted-foreground mt-3">
+            Ask questions anonymously — your identity is never stored
           </p>
         </div>
         <Link href="/anonymous/new">
-          <Button>Ask Anonymously</Button>
+          <Button className="gap-2">
+            <PenLine className="h-4 w-4" />
+            Ask Anonymously
+          </Button>
         </Link>
       </div>
 
       <AnonDisclaimer />
 
-      <div className="space-y-4">
-        {serializedPosts.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              No anonymous posts yet. Be the first to ask a question!
+      <div className="space-y-4 mt-6">
+        {posts.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="py-16 text-center">
+              <Shield className="h-12 w-12 text-primary/40 mx-auto mb-4" />
+              <p className="text-xl font-serif font-bold mb-2">No anonymous posts yet</p>
+              <p className="text-muted-foreground mb-6">Be the first to ask a question!</p>
+              <Link href="/anonymous/new">
+                <Button className="gap-2">
+                  <PenLine className="h-4 w-4" />
+                  Ask a Question
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         ) : (
-          serializedPosts.map((post) => <AnonPostCard key={post.id} post={post} />)
+          posts.map((post: any) => <AnonPostCard key={post.id} post={post} />)
         )}
       </div>
 
       {pagination.totalPages > 1 && (
-        <div className="mt-6 text-center text-sm text-muted-foreground">
+        <div className="mt-8 text-center text-sm text-muted-foreground">
           Page {pagination.page} of {pagination.totalPages}
         </div>
       )}

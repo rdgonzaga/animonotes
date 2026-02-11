@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma";
 // POST /api/users/[id]/block - Block user
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -14,13 +15,13 @@ export async function POST(
     }
 
     // Cannot block yourself
-    if (params.id === session.user.id) {
+    if (id === session.user.id) {
       return NextResponse.json({ error: "Cannot block yourself" }, { status: 400 });
     }
 
     // Check if user exists
     const userToBlock = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!userToBlock) {
@@ -32,7 +33,7 @@ export async function POST(
       where: {
         blockerId_blockedId: {
           blockerId: session.user.id,
-          blockedId: params.id,
+          blockedId: id,
         },
       },
     });
@@ -45,7 +46,7 @@ export async function POST(
     const block = await prisma.block.create({
       data: {
         blockerId: session.user.id,
-        blockedId: params.id,
+        blockedId: id,
       },
     });
 
@@ -59,8 +60,9 @@ export async function POST(
 // DELETE /api/users/[id]/block - Unblock user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -72,7 +74,7 @@ export async function DELETE(
       where: {
         blockerId_blockedId: {
           blockerId: session.user.id,
-          blockedId: params.id,
+          blockedId: id,
         },
       },
     });

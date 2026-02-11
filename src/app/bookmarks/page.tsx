@@ -1,30 +1,85 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { CategoryBadge } from "@/components/categories/category-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { auth } from "@/lib/auth";
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { CategoryBadge } from '@/components/categories/category-badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
-async function getBookmarks() {
-  const res = await fetch(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/bookmarks`, {
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  return res.json();
+async function getBookmarks(userId: string) {
+  try {
+    const bookmarks = await prisma.bookmark.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        post: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+            _count: {
+              select: {
+                comments: true,
+                votes: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Calculate vote scores for each post
+    const bookmarksWithScores = await Promise.all(
+      bookmarks.map(async (bookmark) => {
+        const votes = await prisma.vote.findMany({
+          where: { postId: bookmark.post.id },
+          select: { value: true },
+        });
+        const score = votes.reduce((sum, vote) => sum + vote.value, 0);
+        return {
+          ...bookmark,
+          post: {
+            ...bookmark.post,
+            score,
+          },
+        };
+      })
+    );
+
+    return bookmarksWithScores;
+  } catch (error) {
+    console.error('Bookmarks fetch error:', error);
+    return [];
+  }
 }
 
 export default async function BookmarksPage() {
   const session = await auth();
 
-  if (!session) {
-    redirect("/login");
+  if (!session?.user?.id) {
+    redirect('/login');
   }
 
-  const bookmarks = await getBookmarks();
+  const bookmarks = await getBookmarks(session.user.id);
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">My Bookmarks</h1>
+    <div className="max-w-4xl mx-auto w-full py-8 px-4">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">My Bookmarks</h1>
 
       <div className="space-y-4">
         {bookmarks.length === 0 ? (
@@ -44,7 +99,7 @@ export default async function BookmarksPage() {
                         {bookmark.post.title}
                       </h2>
                     </Link>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground flex-wrap">
                       {bookmark.post.author ? (
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
@@ -61,9 +116,9 @@ export default async function BookmarksPage() {
                       <span>•</span>
                       <span>{new Date(bookmark.post.createdAt).toLocaleDateString()}</span>
                       <span>•</span>
-                      <CategoryBadge 
-                        name={bookmark.post.category.name} 
-                        slug={bookmark.post.category.slug} 
+                      <CategoryBadge
+                        name={bookmark.post.category.name}
+                        slug={bookmark.post.category.slug}
                       />
                     </div>
                   </div>

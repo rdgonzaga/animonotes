@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -15,60 +15,60 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 export default function ProfileSettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "",
-    image: "",
+    name: '',
+    image: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
+    if (status === 'unauthenticated') {
+      router.push('/login');
     }
     if (session?.user) {
       setFormData({
-        name: session.user.name || "",
-        image: session.user.image || "",
+        name: session.user.name || '',
+        image: session.user.image || '',
       });
     }
   }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setSuccess(false);
     setLoading(true);
 
     try {
       const response = await fetch(`/api/users/${session?.user?.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || "Failed to update profile");
+        setError(data.error || 'Failed to update profile');
         setLoading(false);
         return;
       }
 
       setSuccess(true);
       setLoading(false);
-      
+
       // Refresh session
       router.refresh();
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError('An unexpected error occurred');
       setLoading(false);
     }
   };
@@ -78,25 +78,25 @@ export default function ProfileSettingsPage() {
 
     try {
       const response = await fetch(`/api/users/${session?.user?.id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || "Failed to delete account");
+        setError(data.error || 'Failed to delete account');
         setDeleteLoading(false);
         return;
       }
 
       // Sign out and redirect
-      router.push("/login?deleted=true");
+      router.push('/login?deleted=true');
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError('An unexpected error occurred');
       setDeleteLoading(false);
     }
   };
 
-  if (status === "loading") {
+  if (status === 'loading') {
     return <div className="container py-8">Loading...</div>;
   }
 
@@ -105,7 +105,7 @@ export default function ProfileSettingsPage() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4">
+    <div className="max-w-2xl mx-auto w-full py-8 px-4">
       <Card>
         <CardHeader>
           <CardTitle>Profile Settings</CardTitle>
@@ -136,28 +136,29 @@ export default function ProfileSettingsPage() {
             </div>
 
             {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="text-sm text-green-600 bg-green-50 p-3 rounded-md">
+              <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
                 Profile updated successfully!
               </div>
             )}
 
             <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
 
           <div className="mt-8 pt-8 border-t">
             <h3 className="text-lg font-semibold text-red-600 mb-2">Danger Zone</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Once you delete your account, there is no going back. Your posts and comments will be anonymized.
+              Once you delete your account, there is no going back. Your posts and comments will be
+              anonymized.
             </p>
-            
+
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive">Delete Account</Button>
@@ -166,8 +167,8 @@ export default function ProfileSettingsPage() {
                 <DialogHeader>
                   <DialogTitle>Are you absolutely sure?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. This will permanently delete your account
-                    and anonymize all your posts and comments.
+                    This action cannot be undone. This will permanently delete your account and
+                    anonymize all your posts and comments.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -183,7 +184,7 @@ export default function ProfileSettingsPage() {
                     onClick={handleDeleteAccount}
                     disabled={deleteLoading}
                   >
-                    {deleteLoading ? "Deleting..." : "Yes, delete my account"}
+                    {deleteLoading ? 'Deleting...' : 'Yes, delete my account'}
                   </Button>
                 </DialogFooter>
               </DialogContent>

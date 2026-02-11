@@ -6,8 +6,9 @@ import { createPollSchema } from "@/lib/validations/poll";
 // POST /api/posts/[id]/poll - Create poll for post
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -28,7 +29,7 @@ export async function POST(
 
     // Check if post exists and user is the author
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: { poll: true },
     });
 
@@ -53,7 +54,7 @@ export async function POST(
     // Create poll with options
     const poll = await prisma.poll.create({
       data: {
-        postId: params.id,
+        postId: id,
         question,
         endsAt: endsAt ? new Date(endsAt) : null,
         options: {

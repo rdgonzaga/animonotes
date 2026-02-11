@@ -8,12 +8,13 @@ import { notifyCommentReply } from "@/lib/notifications";
 // GET /api/posts/[id]/comments - Get comments for post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const comments = await prisma.comment.findMany({
       where: {
-        postId: params.id,
+        postId: id,
         deletedAt: null,
       },
       include: {
@@ -61,8 +62,9 @@ export async function GET(
 // POST /api/posts/[id]/comments - Create comment
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
   try {
     const session = await auth();
     
@@ -76,7 +78,7 @@ export async function POST(
     const body = await request.json();
     const validation = createCommentSchema.safeParse({
       ...body,
-      postId: params.id,
+      postId: id,
     });
 
     if (!validation.success) {
@@ -90,7 +92,7 @@ export async function POST(
 
     // Check if post exists
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!post || post.deletedAt) {
@@ -137,7 +139,7 @@ export async function POST(
     const comment = await prisma.comment.create({
       data: {
         content,
-        postId: params.id,
+        postId: id,
         parentId,
         authorId: isAnonymous ? null : session.user.id,
         isAnonymous,
@@ -167,9 +169,9 @@ export async function POST(
           ...comment,
           score: 0, // New comment starts with 0 score
         },
-        postId: params.id,
+        postId: id,
       },
-      channel: `post-${params.id}`,
+      channel: `post-${id}`,
     });
 
     // Send notification to parent comment author if this is a reply
@@ -183,7 +185,7 @@ export async function POST(
         await notifyCommentReply({
           recipientId: parentComment.authorId,
           commentId: comment.id,
-          postId: params.id,
+          postId: id,
           authorName: session.user.name || "Someone",
           content,
         });

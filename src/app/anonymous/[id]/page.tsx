@@ -9,49 +9,15 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { UserX } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
 async function getAnonymousPost(id: string) {
-  try {
-    const post = await prisma.post.findUnique({
-      where: {
-        id,
-        isAnonymous: true,
-        authorId: null,
-      },
-      include: {
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
-            votes: true,
-          },
-        },
-      },
-    });
-
-    if (!post || post.deletedAt) {
-      return null;
+  const res = await fetch(
+    `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/anonymous/posts/${id}`,
+    {
+      cache: 'no-store',
     }
-
-    // Calculate vote score
-    const votes = await prisma.vote.findMany({
-      where: { postId: post.id },
-      select: { value: true },
-    });
-    const score = votes.reduce((sum, vote) => sum + vote.value, 0);
-
-    return { ...post, score };
-  } catch (error) {
-    console.error('Anonymous post fetch error:', error);
-    return null;
-  }
+  );
+  if (!res.ok) return null;
+  return res.json();
 }
 
 async function getUserVote(postId: string, userId: string | undefined) {
@@ -77,30 +43,22 @@ export default async function AnonymousPostPage({ params }: { params: Promise<{ 
 
   const userVote = await getUserVote(id, session?.user?.id);
 
-  // Serialize dates for client components
-  const serializedPost = {
-    ...post,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
-    deletedAt: post.deletedAt ? post.deletedAt.toISOString() : null,
-  };
-
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-4xl mx-auto w-full py-8 px-4">
       <AnonDisclaimer />
 
       <Card>
         <CardHeader>
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-2 sm:gap-4">
             <VoteButtons
-              targetId={serializedPost.id}
+              targetId={post.id}
               targetType="post"
-              initialScore={serializedPost.score}
+              initialScore={post.score}
               initialUserVote={userVote}
             />
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-4">{serializedPost.title}</h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-4">{post.title}</h1>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                 <div className="flex items-center gap-2">
                   <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
                     <UserX className="h-4 w-4 text-muted-foreground" />
@@ -108,12 +66,9 @@ export default async function AnonymousPostPage({ params }: { params: Promise<{ 
                   <span className="font-medium text-orange-600">Anonymous</span>
                 </div>
                 <span>•</span>
-                <span>{new Date(serializedPost.createdAt).toLocaleDateString()}</span>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                 <span>•</span>
-                <CategoryBadge
-                  name={serializedPost.category.name}
-                  slug={serializedPost.category.slug}
-                />
+                <CategoryBadge name={post.category.name} slug={post.category.slug} />
               </div>
             </div>
           </div>
@@ -121,11 +76,11 @@ export default async function AnonymousPostPage({ params }: { params: Promise<{ 
         <CardContent>
           <div
             className="prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: serializedPost.content }}
+            dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
           <div className="mt-6 pt-6 border-t flex gap-2 items-center flex-wrap">
-            <ShareButton url={`/anonymous/${serializedPost.id}`} title={serializedPost.title} />
+            <ShareButton url={`/anonymous/${post.id}`} title={post.title} />
           </div>
         </CardContent>
       </Card>
@@ -134,7 +89,7 @@ export default async function AnonymousPostPage({ params }: { params: Promise<{ 
         <h2 className="text-2xl font-bold mb-4">Comments</h2>
         <Card>
           <CardContent className="pt-6">
-            <AnonCommentList postId={serializedPost.id} />
+            <AnonCommentList postId={post.id} />
           </CardContent>
         </Card>
       </div>
