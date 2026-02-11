@@ -1,4 +1,4 @@
-# Hase Forum - Note-Sharing Platform
+# Animo Notes - Note-Sharing Platform
 
 A modern, full-stack forum application built with Next.js 16, featuring rich text editing, threaded discussions, and social engagement features.
 
