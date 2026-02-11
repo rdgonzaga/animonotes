@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto w-full py-8 px-4">
       <div className="mb-8">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">About Hase Forum</h1>
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">About Animo Notes</h1>
         <p className="text-muted-foreground">
           A modern platform for sharing knowledge and growing together
         </p>
@@ -18,7 +18,7 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Hase Forum is built to elevate the study experience. We believe that knowledge grows
+              Animo Notes is built to elevate the study experience. We believe that knowledge grows
               when shared, and our platform makes it easy for students and learners to exchange
               ideas, ask questions, and help each other across a wide range of academic subjects.
             </p>
@@ -69,13 +69,7 @@ export default function AboutPage() {
             </p>
             <div className="mt-4 space-y-2 text-sm text-muted-foreground">
               <p>
-                <strong className="text-foreground">Email:</strong> support@hase.forum
-              </p>
-              <p>
-                <strong className="text-foreground">GitHub:</strong>{' '}
-                <a href="https://github.com/hase-forum" className="text-primary hover:underline">
-                  github.com/hase-forum
-                </a>
+                <strong className="text-foreground">Email:</strong> rainer_gonzaga@dlsu.edu.ph
               </p>
             </div>
           </CardContent>

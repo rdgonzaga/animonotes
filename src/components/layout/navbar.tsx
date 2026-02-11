@@ -50,7 +50,7 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="font-serif text-2xl font-bold text-white">Hase Forum</span>
+          <span className="font-serif text-2xl font-bold text-white">AnimoNotes</span>
         </Link>
 
         {/* Desktop Search Bar */}

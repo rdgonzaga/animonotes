@@ -11,10 +11,10 @@ async function main() {
   const hashedAnswer = await bcrypt.hash('tokyo', 10);
 
   const testUser = await prisma.user.upsert({
-    where: { email: 'test@hase.forum' },
+    where: { email: 'test@animonotes.app' },
     update: {},
     create: {
-      email: 'test@hase.forum',
+      email: 'test@animonotes.app',
       name: 'Test User',
       password: hashedPassword,
       securityQuestion: 'What is your favorite city?',
@@ -78,19 +78,22 @@ async function main() {
       const posts = [
         {
           title: 'What makes the Fibonacci sequence so fascinating?',
-          content: '<p>I\'ve been diving into the Fibonacci sequence lately and I\'m amazed at how it appears everywhere — from sunflower spirals to galaxy formations. What are your favorite examples of Fibonacci in nature?</p>',
+          content:
+            "<p>I've been diving into the Fibonacci sequence lately and I'm amazed at how it appears everywhere — from sunflower spirals to galaxy formations. What are your favorite examples of Fibonacci in nature?</p>",
           authorId: testUser.id,
           categoryId: mathCategory.id,
         },
         {
           title: 'The James Webb Space Telescope — latest discoveries',
-          content: '<p>JWST has been delivering incredible images and data since its launch. What discovery has surprised you the most so far? I\'m personally blown away by the early galaxy formations it has captured.</p>',
+          content:
+            "<p>JWST has been delivering incredible images and data since its launch. What discovery has surprised you the most so far? I'm personally blown away by the early galaxy formations it has captured.</p>",
           authorId: testUser.id,
           categoryId: scienceCategory.id,
         },
         {
-          title: 'Welcome to Hase Forum!',
-          content: '<p>Welcome everyone! This is a space for thoughtful discussion across all topics. Feel free to introduce yourself and share what you\'re interested in. Looking forward to great conversations!</p>',
+          title: 'Welcome to Animo Notes!',
+          content:
+            "<p>Welcome everyone! This is a space for thoughtful discussion across all topics. Feel free to introduce yourself and share what you're interested in. Looking forward to great conversations!</p>",
           authorId: testUser.id,
           categoryId: generalCategory.id,
         },

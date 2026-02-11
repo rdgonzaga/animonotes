@@ -60,7 +60,7 @@ export default function RegisterPage() {
         {/* Brand */}
         <div className="text-center mb-8">
           <Link href="/">
-            <h1 className="font-serif text-4xl font-bold text-primary">Hase Forum</h1>
+            <h1 className="font-serif text-4xl font-bold text-primary">Animo Notes</h1>
           </Link>
           <span className="accent-line mx-auto mt-3" />
         </div>
