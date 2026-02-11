@@ -1,0 +1,336 @@
+// Prisma schema for Hase Forum
+// Complete database schema with auth, posts, comments, voting, DMs, moderation
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== Auth Models ====================
+// Based on Auth.js Prisma adapter schema
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  image             String?
+  password          String?   // For credentials auth
+  securityQuestion  String?
+  securityAnswer    String?
+  role              String    @default("user") // user, moderator, admin
+  emailVerified     DateTime?
+  createdAt         DateTime  @default(now())
+  deletedAt         DateTime? // Soft delete
+  
+  // Relations
+  accounts              Account[]
+  sessions              Session[]
+  posts                 Post[]
+  comments              Comment[]
+  votes                 Vote[]
+  bookmarks             Bookmark[]
+  pollVotes             PollVote[]
+  sentMessages          Message[]
+  conversations         ConversationParticipant[]
+  blockedUsers          Block[]        @relation("Blocker")
+  blockedByUsers        Block[]        @relation("Blocked")
+  reports               Report[]
+  reportedDirectly      Report[]       @relation("ReportedUser")
+  notifications         Notification[]
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ==================== Content Models ====================
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  posts Post[]
+
+  @@index([slug])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+
+  posts PostTag[]
+
+  @@index([slug])
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  image       String?   // Featured image URL
+  authorId    String?   // Nullable for anonymous posts
+  categoryId  String
+  isAnonymous Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  author   User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  category Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  tags      PostTag[]
+  comments  Comment[]
+  votes     Vote[]
+  bookmarks Bookmark[]
+  poll      Poll?
+  reports   Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model PostTag {
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  content     String
+  authorId    String?   // Nullable for anonymous comments
+  postId      String
+  parentId    String?   // For threaded comments
+  isAnonymous Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  author  User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  
+  replies Comment[] @relation("CommentReplies")
+  votes   Vote[]
+  reports Report[]
+
+  @@index([authorId])
+  @@index([postId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String?
+  commentId String?
+  value     Int      // 1 for upvote, -1 for downvote
+  createdAt DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+  @@index([userId])
+  @@index([postId])
+  @@index([commentId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+}
+
+// ==================== Poll Models ====================
+
+model Poll {
+  id          String   @id @default(cuid())
+  postId      String   @unique
+  question    String
+  endsAt      DateTime?
+  isAnonymous Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  post    Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  options PollOption[]
+  votes   PollVote[]
+}
+
+model PollOption {
+  id     String @id @default(cuid())
+  pollId String
+  text   String
+  order  Int
+
+  poll  Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@index([pollId])
+  @@index([pollId, order])
+}
+
+model PollVote {
+  id       String   @id @default(cuid())
+  pollId   String
+  optionId String
+  userId   String
+  createdAt DateTime @default(now())
+
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@index([pollId])
+  @@index([userId])
+}
+
+// ==================== Messaging Models ====================
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  conversationId String
+  userId         String
+  joinedAt       DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+// ==================== Moderation Models ====================
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  reporterId String
+  postId     String?
+  commentId  String?
+  userId     String?  // Report a user directly
+  reason     String
+  status     String   @default("pending") // pending, resolved, dismissed
+  createdAt  DateTime @default(now())
+
+  reporter     User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  post         Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment      Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reportedUser User?    @relation("ReportedUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId])
+  @@index([postId])
+  @@index([commentId])
+  @@index([userId])
+  @@index([status])
+}
+
+// ==================== Notification Models ====================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // comment_reply, vote, mention, poll_end, dm, report_resolved
+  data      Json     // Flexible data for different notification types
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}

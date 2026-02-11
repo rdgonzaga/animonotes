@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/.vitest
+
+# Next.js
+/.next/
+/out/
+*.rsc
+
+# Production
+/build
+/dist
+
+# Misc
+.DS_Store
+*.pem
+.env
+.env.local
+.env.*.local
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# OS
+Thumbs.db
+
+/src/generated/prisma
+
+# Test reports and internal docs
+test-reports/
+.sisyphus/
+
+# Design assets (optional - large files)
+figma/
+
+# Development databases
+dev.db
+dev.db-journal
+*.sqlite
+*.sqlite3
+
+# Windows artifacts
+nul
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
+# Docker environment (secrets)
+docker-compose.env
+
+# Additional env patterns
+.env.production
+.env.staging

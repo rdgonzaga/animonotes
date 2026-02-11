@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: hase-forum-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hase_forum
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hase-forum-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hase-forum-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: docker-compose.env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/hase_forum?schema=public
+      NODE_ENV: production
+      NEXTAUTH_URL: http://localhost:3002
+      NEXTAUTH_TRUST_HOST: 'true'
+    ports:
+      - '3002:3000'
+    volumes:
+      - ./public:/app/public
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3000']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hase-forum-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  hase-forum-network:
+    driver: bridge
