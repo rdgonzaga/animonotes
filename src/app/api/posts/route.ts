@@ -7,8 +7,12 @@ import { createPostSchema } from '@/lib/validations/post';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const pageParam = Number(searchParams.get('page') || '1');
+    const limitParam = Number(searchParams.get('limit') || '10');
+    const page = Number.isFinite(pageParam) && pageParam > 0 ? Math.floor(pageParam) : 1;
+    const limit = Number.isFinite(limitParam)
+      ? Math.min(Math.max(Math.floor(limitParam), 1), 50)
+      : 10;
     const categorySlug = searchParams.get('category');
     const skip = (page - 1) * limit;
 
@@ -55,17 +59,19 @@ export async function GET(request: NextRequest) {
       prisma.post.count({ where }),
     ]);
 
-    // Calculate vote scores
-    const postsWithScores = await Promise.all(
-      posts.map(async (post) => {
-        const votes = await prisma.vote.findMany({
-          where: { postId: post.id },
-          select: { value: true },
-        });
-        const score = votes.reduce((sum, vote) => sum + vote.value, 0);
-        return { ...post, score };
-      })
-    );
+    const postIds = posts.map((post) => post.id);
+    const voteSums = postIds.length
+      ? await prisma.vote.groupBy({
+          by: ['postId'],
+          where: { postId: { in: postIds } },
+          _sum: { value: true },
+        })
+      : [];
+    const voteMap = new Map(voteSums.map((vote) => [vote.postId, vote._sum.value ?? 0]));
+    const postsWithScores = posts.map((post) => ({
+      ...post,
+      score: voteMap.get(post.id) ?? 0,
+    }));
 
     return NextResponse.json({
       posts: postsWithScores,

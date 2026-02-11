@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { createReportSchema } from "@/lib/validations/report";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
+import { createReportSchema } from '@/lib/validations/report';
 
 // POST /api/reports - Create report
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -20,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validation.error.issues },
+        { error: 'Validation failed', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -38,10 +35,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "You have already reported this" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'You have already reported this' }, { status: 409 });
     }
 
     const report = await prisma.report.create({
@@ -51,17 +45,14 @@ export async function POST(request: NextRequest) {
         postId,
         commentId,
         userId,
-        status: "PENDING",
+        status: 'PENDING',
       },
     });
 
     return NextResponse.json(report, { status: 201 });
   } catch (error) {
-    console.error("Report creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create report" },
-      { status: 500 }
-    );
+    console.error('Report creation error:', error);
+    return NextResponse.json({ error: 'Failed to create report' }, { status: 500 });
   }
 }
 
@@ -69,16 +60,14 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
-    
-    if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Forbidden - admin only" },
-        { status: 403 }
-      );
+
+    const isAdmin = session?.user?.role?.toLowerCase() === 'admin';
+    if (!session?.user || !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden - admin only' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status") || "PENDING";
+    const status = searchParams.get('status') || 'PENDING';
 
     const reports = await prisma.report.findMany({
       where: {
@@ -113,16 +102,13 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return NextResponse.json(reports);
   } catch (error) {
-    console.error("Reports fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch reports" },
-      { status: 500 }
-    );
+    console.error('Reports fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch reports' }, { status: 500 });
   }
 }

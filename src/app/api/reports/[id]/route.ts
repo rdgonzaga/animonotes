@@ -1,30 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 
 // PATCH /api/reports/[id] - Update report status (admin only)
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
-    
-    if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Forbidden - admin only" },
-        { status: 403 }
-      );
+
+    const isAdmin = session?.user?.role?.toLowerCase() === 'admin';
+    if (!session?.user || !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden - admin only' }, { status: 403 });
     }
 
     const body = await request.json();
     const { status, action } = body;
 
-    if (!["PENDING", "RESOLVED", "DISMISSED"].includes(status)) {
-      return NextResponse.json(
-        { error: "Invalid status" },
-        { status: 400 }
-      );
+    if (!['PENDING', 'RESOLVED', 'DISMISSED'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
     const report = await prisma.report.findUnique({
@@ -32,30 +24,27 @@ export async function PATCH(
     });
 
     if (!report) {
-      return NextResponse.json(
-        { error: "Report not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
 
     // Perform action if specified
-    if (action === "delete_post" && report.postId) {
+    if (action === 'delete_post' && report.postId) {
       await prisma.post.update({
         where: { id: report.postId },
         data: { deletedAt: new Date() },
       });
-    } else if (action === "delete_comment" && report.commentId) {
+    } else if (action === 'delete_comment' && report.commentId) {
       await prisma.comment.update({
         where: { id: report.commentId },
         data: { deletedAt: new Date() },
       });
-    } else if (action === "ban_user" && report.userId) {
+    } else if (action === 'ban_user' && report.userId) {
       await prisma.user.update({
         where: { id: report.userId },
-        data: { 
+        data: {
           deletedAt: new Date(),
           email: `banned_${report.userId}@banned.com`,
-          name: "[Banned User]",
+          name: '[Banned User]',
         },
       });
     }
@@ -67,10 +56,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedReport);
   } catch (error) {
-    console.error("Report update error:", error);
-    return NextResponse.json(
-      { error: "Failed to update report" },
-      { status: 500 }
-    );
+    console.error('Report update error:', error);
+    return NextResponse.json({ error: 'Failed to update report' }, { status: 500 });
   }
 }

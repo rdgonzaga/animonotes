@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
-import { registerSchema } from "@/lib/validations/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { prisma } from '@/lib/prisma';
+import { registerSchema } from '@/lib/validations/auth';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate input
     const validation = registerSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validation.error.issues },
+        { error: 'Validation failed', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -24,10 +24,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "User with this email already exists" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 409 });
     }
 
     // Hash password and security answer
@@ -41,8 +38,8 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         securityQuestion,
         securityAnswer: hashedAnswer,
-        name: email.split("@")[0], // Default name from email
-        role: "USER",
+        name: email.split('@')[0], // Default name from email
+        role: 'user',
       },
       select: {
         id: true,
@@ -53,15 +50,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      { message: "User registered successfully", user },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: 'User registered successfully', user }, { status: 201 });
   } catch (error) {
-    console.error("Registration error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Registration error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

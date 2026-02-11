@@ -26,16 +26,19 @@ async function getPosts() {
       prisma.post.count({ where: { deletedAt: null } }),
     ]);
 
-    const postsWithScores = await Promise.all(
-      posts.map(async (post) => {
-        const votes = await prisma.vote.findMany({
-          where: { postId: post.id },
-          select: { value: true },
-        });
-        const score = votes.reduce((sum, vote) => sum + vote.value, 0);
-        return { ...post, score };
-      })
-    );
+    const postIds = posts.map((post) => post.id);
+    const voteSums = postIds.length
+      ? await prisma.vote.groupBy({
+          by: ['postId'],
+          where: { postId: { in: postIds } },
+          _sum: { value: true },
+        })
+      : [];
+    const voteMap = new Map(voteSums.map((vote) => [vote.postId, vote._sum.value ?? 0]));
+    const postsWithScores = posts.map((post) => ({
+      ...post,
+      score: voteMap.get(post.id) ?? 0,
+    }));
 
     return { posts: postsWithScores, pagination: { total } };
   } catch {
