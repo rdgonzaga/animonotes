@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Calendar, PenSquare } from 'lucide-react';
+import { Calendar, MessageSquare, PenSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BookmarkButton } from '@/components/bookmarks/bookmark-button';
 import { PostCardMenu } from '@/components/home/post-card-menu';
-import { CompactVoteButtons } from '@/components/votes/compact-vote-buttons';
+import { VoteButtons } from '@/components/votes/vote-buttons';
 
 interface PostListProps {
   posts: any[];
@@ -51,6 +51,9 @@ export function PostList({ posts, emptyMessage }: PostListProps) {
           <CardContent className="p-4 md:p-5">
             <div className="flex gap-4">
               {/* Content */}
+              <div className="flex items-center justify-center w-10">
+                <VoteButtons targetId={post.id} targetType="post" initialScore={post.score} />
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-end gap-1 md:hidden">
                   <BookmarkButton postId={post.id} />
@@ -84,29 +87,28 @@ export function PostList({ posts, emptyMessage }: PostListProps) {
                 </p>
 
                 {/* Stats footer */}
-                <div className="flex justify-start mt-3 mb-3 gap-3 flex-wrap items-center">
+                <div className="flex justify-start mt-3 mb-3">
                   {post.category && <span className="badge-category">{post.category.name}</span>}
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                </div>
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
                     {format(new Date(post.createdAt), 'MMM d, yyyy • h:mm a')}
                   </span>
-                </div>
-                <div className="flex items-center gap-3 mt-2">
-                  <CompactVoteButtons
-                    targetId={post.id}
-                    targetType="post"
-                    initialScore={post.score}
-                    commentCount={post._count?.comments || 0}
-                  />
+                  <span className="flex items-center gap-1">
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    {post._count?.comments || 0}
+                  </span>
                 </div>
               </div>
 
               {/* Thumbnail + actions */}
-              <div className="hidden md:flex w-40 shrink-0 flex-col items-end gap-2">
+              <div className="hidden md:flex w-35 shrink-0 flex-col items-end gap-2">
                 <div className="flex gap-1">
                   <BookmarkButton postId={post.id} />
                   <PostCardMenu postId={post.id} postTitle={post.title} />
                 </div>
+
                 <div className="w-32 h-32 rounded-lg bg-primary/10 overflow-hidden">
                   {post.image ? (
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
