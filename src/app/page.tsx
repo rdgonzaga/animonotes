@@ -2,11 +2,12 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, Bookmark as BookmarkIcon, HelpCircle, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { HeroSlider } from '@/components/home/hero-slider';
 import { FeedSection } from '@/components/home/feed-section';
+import { Sidebar } from '@/components/layout/sidebar';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,32 +125,7 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto w-full px-4 py-6">
         <div className="flex gap-6">
           {/* Left Sidebar — Desktop only */}
-          <aside className="hidden lg:flex flex-col gap-1 w-44 xl:w-48 shrink-0 pt-2">
-            <Link
-              href="/"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-primary font-medium bg-primary/5"
-            >
-              <Home className="h-4 w-4" /> HOME
-            </Link>
-            <Link
-              href="/settings/profile"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <User className="h-4 w-4" /> PROFILE
-            </Link>
-            <Link
-              href="/bookmarks"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <BookmarkIcon className="h-4 w-4" /> SAVED
-            </Link>
-            <Link
-              href="/faqs"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <HelpCircle className="h-4 w-4" /> FAQS
-            </Link>
-          </aside>
+          <Sidebar />
 
           {/* Main Feed (client component with tabs, sort, filter, and post cards) */}
           <FeedSection posts={serializedPosts} categories={categories} />
