@@ -6,8 +6,8 @@ import { ArrowRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { HeroSlider } from '@/components/home/hero-slider';
-import { FeedSection } from '@/components/home/feed-section';
 import { Sidebar } from '@/components/layout/sidebar';
+import { PostList } from '@/components/posts/post-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,8 +127,14 @@ export default async function HomePage() {
           {/* Left Sidebar — Desktop only */}
           <Sidebar />
 
-          {/* Main Feed (client component with tabs, sort, filter, and post cards) */}
-          <FeedSection posts={serializedPosts} categories={categories} />
+          {/* Main Feed */}
+          <main className="flex-1 min-w-0">
+            <div className="max-w-4xl mx-auto">
+              <div className="space-y-4">
+                <PostList posts={serializedPosts} />
+              </div>
+            </div>
+          </main>
 
           {/* Right Sidebar — Desktop only */}
           <aside className="hidden xl:flex flex-col gap-5 w-72 shrink-0">
