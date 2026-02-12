@@ -76,7 +76,7 @@ export function HeroSlider({ featuredPosts }: HeroSliderProps) {
             )}
           </div>
           <Link href={`/posts/${post.id}`}>
-            <h2 className="font-serif text-2xl md:text-4xl font-bold leading-tight hover:underline">
+            <h2 className="font-sans text-2xl md:text-4xl font-bold leading-tight hover:underline">
               {post.title}
             </h2>
           </Link>

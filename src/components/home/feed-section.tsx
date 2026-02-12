@@ -154,38 +154,38 @@ export function FeedSection({ posts, categories }: FeedSectionProps) {
             key={post.id}
             className="group hover:shadow-md transition-all duration-200 overflow-hidden"
           >
-            <CardContent className="p-4 md:p-5">
+            <CardContent className="relative p-4 md:p-5">
+              {/* Top row: bookmark + more */}
+              <div className="absolute right-4 top-4 md:right-5 md:top-5 flex gap-1">
+                <BookmarkButton postId={post.id} />
+                <PostCardMenu postId={post.id} postTitle={post.title} />
+              </div>
+
               <div className="flex gap-4">
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   {/* Author row */}
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={post.author?.image || undefined} />
-                        <AvatarFallback className="text-xs bg-muted text-muted-foreground">
-                          {post.author?.name?.charAt(0).toUpperCase() || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-semibold">
-                        {post.author?.name || 'Anonymous'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 -mt-1">
-                      <BookmarkButton postId={post.id} />
-                      <PostCardMenu postId={post.id} postTitle={post.title} />
-                    </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={post.author?.image || undefined} />
+                      <AvatarFallback className="text-xs bg-muted text-muted-foreground">
+                        {post.author?.name?.charAt(0).toUpperCase() || '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-semibold">
+                      {post.author?.name || 'Anonymous'}
+                    </span>
                   </div>
 
                   {/* Title */}
                   <Link href={`/posts/${post.id}`}>
-                    <h3 className="font-bold text-base group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                    <h3 className="font-bold text-base group-hover:text-primary transition-colors line-clamp-2 mb-0.5">
                       {post.title}
                     </h3>
                   </Link>
 
                   {/* Description */}
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                     {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}
                   </p>
 

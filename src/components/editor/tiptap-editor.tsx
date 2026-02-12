@@ -33,6 +33,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
   const [uploading, setUploading] = useState(false);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         codeBlock: false,
