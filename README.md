@@ -37,6 +37,59 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
 
 ## 🚀 Getting Started
 
+### Fresh Device Setup (Recommended)
+
+1. **Install prerequisites:**
+
+   - Node.js 18+
+   - Docker + Docker Compose
+
+2. **Clone and install:**
+
+   ```bash
+   git clone <your-repo-url>
+   cd animonotes
+   npm install
+   ```
+
+3. **Create env files:**
+
+   ```bash
+   copy docker-compose.env.example docker-compose.env
+   copy .env.example .env
+   ```
+
+   Update `.env` to match your local setup. Example:
+
+   ```env
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5433/animonotes?schema=public"
+   AUTH_SECRET="your-secret"
+   NEXTAUTH_URL="http://localhost:3000"
+   ```
+
+4. **Start Postgres (local dev):**
+
+   ```bash
+   docker-compose -f docker-compose.animonotes.yml up -d
+   ```
+
+5. **Run migrations and seed:**
+
+   ```bash
+   npx prisma migrate deploy
+   npx prisma db seed
+   ```
+
+6. **Start the app:**
+
+   ```bash
+   npm run dev
+   ```
+
+7. **Open in browser:**
+
+   - http://localhost:3000
+
 ### Prerequisites
 
 - Node.js 18+
