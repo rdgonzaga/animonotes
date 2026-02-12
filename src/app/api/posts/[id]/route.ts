@@ -4,10 +4,11 @@ import { auth } from '@/lib/auth';
 import { updatePostSchema } from '@/lib/validations/post';
 
 // GET /api/posts/[id] - Get single post
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         author: {
           select: {
@@ -50,8 +51,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PATCH /api/posts/[id] - Update post
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -59,7 +61,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!post || post.deletedAt) {
@@ -81,7 +83,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const updatedPost = await prisma.post.update({
-      where: { id: params.id },
+      where: { id },
       data: validation.data,
       include: {
         author: {
@@ -109,8 +111,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 // DELETE /api/posts/[id] - Soft delete post
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -118,7 +124,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!post || post.deletedAt) {
@@ -131,7 +137,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     await prisma.post.update({
-      where: { id: params.id },
+      where: { id },
       data: { deletedAt: new Date() },
     });
 

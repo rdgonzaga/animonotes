@@ -1,34 +1,34 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: hase-forum-db
+    container_name: animonotes-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: hase_forum
+      POSTGRES_DB: animonotes
     ports:
       - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - animonotes_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - hase-forum-network
+      - animonotes-network
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: hase-forum-app
+    container_name: animonotes-app
     depends_on:
       postgres:
         condition: service_healthy
     env_file: docker-compose.env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/hase_forum?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/animonotes?schema=public
       NODE_ENV: production
       NEXTAUTH_URL: http://localhost:3002
       NEXTAUTH_TRUST_HOST: 'true'
@@ -43,12 +43,12 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - hase-forum-network
+      - animonotes-network
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  animonotes_postgres_data:
 
 networks:
-  hase-forum-network:
+  animonotes-network:
     driver: bridge

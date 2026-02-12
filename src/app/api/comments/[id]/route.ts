@@ -4,8 +4,9 @@ import { auth } from '@/lib/auth';
 import { updateCommentSchema } from '@/lib/validations/comment';
 
 // PATCH /api/comments/[id] - Update comment
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -13,7 +14,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const comment = await prisma.comment.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!comment || comment.deletedAt) {
@@ -38,7 +39,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const updatedComment = await prisma.comment.update({
-      where: { id: params.id },
+      where: { id },
       data: validation.data,
       include: {
         author: {
@@ -59,8 +60,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 // DELETE /api/comments/[id] - Soft delete comment
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -68,7 +73,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     const comment = await prisma.comment.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!comment || comment.deletedAt) {
@@ -84,7 +89,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     await prisma.comment.update({
-      where: { id: params.id },
+      where: { id },
       data: { deletedAt: new Date() },
     });
 

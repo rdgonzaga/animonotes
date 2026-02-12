@@ -3,8 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 
 // PATCH /api/reports/[id] - Update report status (admin only)
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     const isAdmin = session?.user?.role?.toLowerCase() === 'admin';
@@ -20,7 +21,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const report = await prisma.report.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!report) {
@@ -50,7 +51,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const updatedReport = await prisma.report.update({
-      where: { id: params.id },
+      where: { id },
       data: { status },
     });
 
