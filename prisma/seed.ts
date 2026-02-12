@@ -79,6 +79,23 @@ const TOPICS = [
   'note-taking systems',
 ];
 
+const PROFILE_IMAGES = [
+  '/dummy_icons/profile1.jpg',
+  '/dummy_icons/profile2.jpg',
+  '/dummy_icons/profile3.jpg',
+  '/dummy_icons/profile4.jpg',
+  '/dummy_icons/profile5.jpg',
+];
+
+const POST_IMAGES = [
+  '/dummy_mainpic/comsci.jpg',
+  '/dummy_mainpic/engineering.jpeg',
+  '/dummy_mainpic/english1.jpg',
+  '/dummy_mainpic/math1.webp',
+  '/dummy_mainpic/psychology.jpg',
+  '/dummy_mainpic/science1.jpg',
+];
+
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -143,6 +160,7 @@ async function main() {
     data: {
       email: 'test@animonotes.app',
       name: 'Test User',
+      image: pickOne(PROFILE_IMAGES),
       password: hashedPassword,
       securityQuestion: 'What is your favorite city?',
       securityAnswer: hashedAnswer,
@@ -157,6 +175,7 @@ async function main() {
     const user = await prisma.user.create({
       data: {
         email,
+        image: pickOne(PROFILE_IMAGES),
         name,
         password: hashedPassword,
         securityQuestion: 'What is your favorite city?',
@@ -183,6 +202,7 @@ async function main() {
     const post = await prisma.post.create({
       data: {
         title: buildTitle(topic),
+        image: Math.random() < 0.7 ? pickOne(POST_IMAGES) : null,
         content: buildContent(topic, category.name),
         authorId: author.id,
         categoryId: category.id,
