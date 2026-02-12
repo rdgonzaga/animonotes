@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/features/auth/lib/auth';
 
 // GET /api/users/[id] - Get user profile
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const user = await prisma.user.findUnique({
       where: { id: id },
@@ -27,10 +24,7 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Calculate karma (simplified: upvotes on user's posts and comments)
@@ -62,35 +56,23 @@ export async function GET(
       karma,
     });
   } catch (error) {
-    console.error("User fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch user" },
-      { status: 500 }
-    );
+    console.error('User fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
   }
 }
 
 // PATCH /api/users/[id] - Update user profile
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     if (session.user.id !== id) {
-      return NextResponse.json(
-        { error: "Forbidden - can only edit own profile" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - can only edit own profile' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -112,11 +94,8 @@ export async function PATCH(
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("User update error:", error);
-    return NextResponse.json(
-      { error: "Failed to update user" },
-      { status: 500 }
-    );
+    console.error('User update error:', error);
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
 
@@ -125,20 +104,17 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+  const { id } = await params;
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     if (session.user.id !== id) {
       return NextResponse.json(
-        { error: "Forbidden - can only delete own account" },
+        { error: 'Forbidden - can only delete own account' },
         { status: 403 }
       );
     }
@@ -149,7 +125,7 @@ export async function DELETE(
       data: {
         deletedAt: new Date(),
         email: `deleted_${id}@deleted.com`, // Anonymize email
-        name: "[Deleted User]",
+        name: '[Deleted User]',
         image: null,
       },
     });
@@ -166,12 +142,9 @@ export async function DELETE(
       data: { authorId: null },
     });
 
-    return NextResponse.json({ message: "Account deleted successfully" });
+    return NextResponse.json({ message: 'Account deleted successfully' });
   } catch (error) {
-    console.error("User deletion error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete account" },
-      { status: 500 }
-    );
+    console.error('User deletion error:', error);
+    return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 });
   }
 }

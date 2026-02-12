@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { createReportSchema } from '@/lib/validations/report';
 
 // POST /api/reports - Create report

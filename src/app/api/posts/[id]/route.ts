@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { updatePostSchema } from '@/lib/validations/post';
 
 // GET /api/posts/[id] - Get single post

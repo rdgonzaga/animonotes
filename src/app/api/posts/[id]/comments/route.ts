@@ -1,16 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { createCommentSchema } from "@/lib/validations/comment";
-import { sseBroadcaster } from "@/lib/sse-broadcaster";
-import { notifyCommentReply } from "@/lib/notifications";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/features/auth/lib/auth';
+import { createCommentSchema } from '@/lib/validations/comment';
+import { sseBroadcaster } from '@/lib/sse-broadcaster';
+import { notifyCommentReply } from '@/features/notifications/lib/notifications';
 
 // GET /api/posts/[id]/comments - Get comments for post
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const comments = await prisma.comment.findMany({
       where: {
@@ -33,7 +30,7 @@ export async function GET(
         },
       },
       orderBy: {
-        createdAt: "asc",
+        createdAt: 'asc',
       },
     });
 
@@ -51,28 +48,19 @@ export async function GET(
 
     return NextResponse.json(commentsWithScores);
   } catch (error) {
-    console.error("Comments fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch comments" },
-      { status: 500 }
-    );
+    console.error('Comments fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
   }
 }
 
 // POST /api/posts/[id]/comments - Create comment
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -83,7 +71,7 @@ export async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validation.error.issues },
+        { error: 'Validation failed', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -96,24 +84,19 @@ export async function POST(
     });
 
     if (!post || post.deletedAt) {
-      return NextResponse.json(
-        { error: "Post not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
     // If replying to a comment, check parent exists and depth limit
     if (parentId) {
-    const parent: { parentId: string | null; deletedAt: Date | null } | null = await prisma.comment.findUnique({
-      where: { id: parentId },
-      select: { parentId: true, deletedAt: true },
-    });
+      const parent: { parentId: string | null; deletedAt: Date | null } | null =
+        await prisma.comment.findUnique({
+          where: { id: parentId },
+          select: { parentId: true, deletedAt: true },
+        });
 
       if (!parent || parent.deletedAt) {
-        return NextResponse.json(
-          { error: "Parent comment not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Parent comment not found' }, { status: 404 });
       }
 
       // Check depth (max 5 levels)
@@ -129,10 +112,7 @@ export async function POST(
       }
 
       if (depth >= 5) {
-        return NextResponse.json(
-          { error: "Maximum comment depth reached" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Maximum comment depth reached' }, { status: 400 });
       }
     }
 
@@ -186,7 +166,7 @@ export async function POST(
           recipientId: parentComment.authorId,
           commentId: comment.id,
           postId: id,
-          authorName: session.user.name || "Someone",
+          authorName: session.user.name || 'Someone',
           content,
         });
       }
@@ -194,10 +174,7 @@ export async function POST(
 
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {
-    console.error("Comment creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create comment" },
-      { status: 500 }
-    );
+    console.error('Comment creation error:', error);
+    return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });
   }
 }

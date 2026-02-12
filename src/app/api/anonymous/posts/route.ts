@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
-import { createAnonymousPostSchema } from "@/lib/validations/anonymous";
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
+import { createAnonymousPostSchema } from '@/lib/validations/anonymous';
 
 // GET /api/anonymous/posts - List anonymous posts with pagination
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const categorySlug = searchParams.get("category");
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const categorySlug = searchParams.get('category');
     const skip = (page - 1) * limit;
 
     const where = {
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: 'desc',
         },
         skip,
         take: limit,
@@ -72,11 +72,8 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Anonymous posts fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch anonymous posts" },
-      { status: 500 }
-    );
+    console.error('Anonymous posts fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch anonymous posts' }, { status: 500 });
   }
 }
 
@@ -88,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: validation.error.issues },
+        { error: 'Validation failed', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -117,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     // Store post ID in cookie for edit/delete rights
     const cookieStore = await cookies();
-    const anonPosts = cookieStore.get("anonPosts")?.value || "[]";
+    const anonPosts = cookieStore.get('anonPosts')?.value || '[]';
     let postIds: string[] = [];
     try {
       postIds = JSON.parse(anonPosts);
@@ -126,19 +123,16 @@ export async function POST(request: NextRequest) {
     }
     postIds.push(post.id);
 
-    cookieStore.set("anonPosts", JSON.stringify(postIds), {
+    cookieStore.set('anonPosts', JSON.stringify(postIds), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 365, // 1 year
     });
 
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
-    console.error("Anonymous post creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create anonymous post" },
-      { status: 500 }
-    );
+    console.error('Anonymous post creation error:', error);
+    return NextResponse.json({ error: 'Failed to create anonymous post' }, { status: 500 });
   }
 }

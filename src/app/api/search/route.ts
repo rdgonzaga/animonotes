@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 // GET /api/search - Search posts and users
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get("q");
-    const type = searchParams.get("type") || "all"; // all, posts, users
+    const query = searchParams.get('q');
+    const type = searchParams.get('type') || 'all'; // all, posts, users
 
     if (!query || query.trim().length < 2) {
       return NextResponse.json(
-        { error: "Search query must be at least 2 characters" },
+        { error: 'Search query must be at least 2 characters' },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     };
 
     // Search posts
-    if (type === "all" || type === "posts") {
+    if (type === 'all' || type === 'posts') {
       const posts = await prisma.post.findMany({
         where: {
           deletedAt: null,
@@ -30,13 +30,13 @@ export async function GET(request: NextRequest) {
             {
               title: {
                 contains: searchTerm,
-                mode: "insensitive",
+                mode: 'insensitive',
               },
             },
             {
               content: {
                 contains: searchTerm,
-                mode: "insensitive",
+                mode: 'insensitive',
               },
             },
           ],
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         },
         take: 20,
         orderBy: {
-          createdAt: "desc",
+          createdAt: 'desc',
         },
       });
 
@@ -85,13 +85,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Search users
-    if (type === "all" || type === "users") {
+    if (type === 'all' || type === 'users') {
       const users = await prisma.user.findMany({
         where: {
           deletedAt: null,
           name: {
             contains: searchTerm,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
         select: {
@@ -114,10 +114,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(results);
   } catch (error) {
-    console.error("Search error:", error);
-    return NextResponse.json(
-      { error: "Search failed" },
-      { status: 500 }
-    );
+    console.error('Search error:', error);
+    return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }

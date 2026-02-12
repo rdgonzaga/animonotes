@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 
 // GET /api/bookmarks/ids - Get just the post IDs the user has bookmarked (lightweight)
 export async function GET() {

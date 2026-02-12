@@ -1,11 +1,11 @@
-import { NextRequest } from "next/server";
-import { sseBroadcaster } from "@/lib/sse-broadcaster";
-import { auth } from "@/lib/auth";
+import { NextRequest } from 'next/server';
+import { sseBroadcaster } from '@/lib/sse-broadcaster';
+import { auth } from '@/features/auth/lib/auth';
 
 /**
  * GET /api/sse - Server-Sent Events endpoint
  * Establishes real-time connection for live updates
- * 
+ *
  * Query params:
  * - channels: Comma-separated list of channels to subscribe to (e.g., "post-123,comments-123")
  */
@@ -25,11 +25,11 @@ export async function GET(request: NextRequest) {
       const connectionId = sseBroadcaster.addConnection(controller, channels, userId);
 
       // Send initial connection event
-      const welcomeMessage = `event: connected\ndata: ${JSON.stringify({ 
+      const welcomeMessage = `event: connected\ndata: ${JSON.stringify({
         connectionId,
         channels,
         userId: userId || null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })}\n\n`;
       controller.enqueue(new TextEncoder().encode(welcomeMessage));
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'X-Accel-Buffering': 'no', // Disable nginx buffering
     },
   });

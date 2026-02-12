@@ -6,9 +6,9 @@ import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageThread } from '@/components/messages/message-thread';
-import { MessageInput } from '@/components/messages/message-input';
-import { BlockUserButton } from '@/components/messages/block-user-button';
+import { MessageThread } from '@/features/messages/components/message-thread';
+import { MessageInput } from '@/features/messages/components/message-input';
+import { BlockUserButton } from '@/features/messages/components/block-user-button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 

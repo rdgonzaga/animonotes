@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LogoutButton } from '@/components/auth/logout-button';
+import { LogoutButton } from '@/features/auth/components/logout-button';
 
 export function Navbar() {
   const pathname = usePathname();

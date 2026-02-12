@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CategoryBadge } from '@/components/categories/category-badge';
+import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Sidebar } from '@/components/layout/sidebar';
 

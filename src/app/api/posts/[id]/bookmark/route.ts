@@ -1,21 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/features/auth/lib/auth';
 
 // POST /api/posts/[id]/bookmark - Add bookmark
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if post exists
@@ -24,10 +18,7 @@ export async function POST(
     });
 
     if (!post || post.deletedAt) {
-      return NextResponse.json(
-        { error: "Post not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
     // Check if already bookmarked
@@ -41,10 +32,7 @@ export async function POST(
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "Post already bookmarked" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Post already bookmarked' }, { status: 409 });
     }
 
     // Create bookmark
@@ -57,11 +45,8 @@ export async function POST(
 
     return NextResponse.json(bookmark, { status: 201 });
   } catch (error) {
-    console.error("Bookmark creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create bookmark" },
-      { status: 500 }
-    );
+    console.error('Bookmark creation error:', error);
+    return NextResponse.json({ error: 'Failed to create bookmark' }, { status: 500 });
   }
 }
 
@@ -70,15 +55,12 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+  const { id } = await params;
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await prisma.bookmark.deleteMany({
@@ -88,12 +70,9 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({ message: "Bookmark removed" });
+    return NextResponse.json({ message: 'Bookmark removed' });
   } catch (error) {
-    console.error("Bookmark deletion error:", error);
-    return NextResponse.json(
-      { error: "Failed to remove bookmark" },
-      { status: 500 }
-    );
+    console.error('Bookmark deletion error:', error);
+    return NextResponse.json({ error: 'Failed to remove bookmark' }, { status: 500 });
   }
 }

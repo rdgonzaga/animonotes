@@ -1,12 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 // GET /api/polls/[id]/results - Get poll results
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const poll = await prisma.poll.findUnique({
       where: { id: id },
@@ -20,7 +17,7 @@ export async function GET(
             },
           },
           orderBy: {
-            order: "asc",
+            order: 'asc',
           },
         },
         _count: {
@@ -32,7 +29,7 @@ export async function GET(
     });
 
     if (!poll) {
-      return NextResponse.json({ error: "Poll not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Poll not found' }, { status: 404 });
     }
 
     const totalVotes = poll._count.votes;
@@ -52,7 +49,7 @@ export async function GET(
 
     return NextResponse.json(results);
   } catch (error) {
-    console.error("Error fetching poll results:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching poll results:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

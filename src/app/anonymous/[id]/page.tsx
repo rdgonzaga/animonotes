@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CategoryBadge } from '@/components/categories/category-badge';
-import { VoteButtons } from '@/components/votes/vote-buttons';
-import { ShareButton } from '@/components/share/share-button';
-import { AnonCommentList } from '@/components/anonymous/anon-comment-list';
-import { AnonDisclaimer } from '@/components/anonymous/anon-disclaimer';
-import { auth } from '@/lib/auth';
+import { CategoryBadge } from '@/features/categories/components/category-badge';
+import { VoteButtons } from '@/features/votes/components/vote-buttons';
+import { ShareButton } from '@/features/share/components/share-button';
+import { AnonCommentList } from '@/features/anonymous/components/anon-comment-list';
+import { AnonDisclaimer } from '@/features/anonymous/components/anon-disclaimer';
+import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { UserX } from 'lucide-react';
 

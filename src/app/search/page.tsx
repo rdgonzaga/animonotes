@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CategoryBadge } from '@/components/categories/category-badge';
+import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search as SearchIcon, Calendar, Eye, MessageSquare } from 'lucide-react';
 

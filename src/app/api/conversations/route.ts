@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { createConversationSchema } from "@/lib/validations/message";
+import { auth } from '@/features/auth/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { createConversationSchema } from '@/lib/validations/message';
 
 // GET /api/conversations - List user's conversations
 export async function GET() {

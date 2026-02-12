@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
-import { HeroSlider } from '@/components/home/hero-slider';
+import { auth } from '@/features/auth/lib/auth';
+import { HeroSlider } from '@/features/home/components/hero-slider';
 import { Sidebar } from '@/components/layout/sidebar';
-import { PostList } from '@/components/posts/post-list';
+import { PostList } from '@/features/posts/components/post-list';
 
 export const dynamic = 'force-dynamic';
 

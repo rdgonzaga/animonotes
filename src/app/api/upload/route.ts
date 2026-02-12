@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 
 // Local file upload endpoint (replaces Uploadthing)
 export async function POST(request: NextRequest) {

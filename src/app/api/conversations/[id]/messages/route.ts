@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { sendMessageSchema } from "@/lib/validations/message";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/features/auth/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { sendMessageSchema } from '@/lib/validations/message';
 
 // POST /api/conversations/[id]/messages - Send message
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -20,7 +17,7 @@ export async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: validation.error.issues },
+        { error: 'Invalid input', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -36,21 +33,17 @@ export async function POST(
     });
 
     if (!conversation) {
-      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     }
 
-    const isParticipant = conversation.participants.some(
-      (p) => p.userId === session.user.id
-    );
+    const isParticipant = conversation.participants.some((p) => p.userId === session.user.id);
 
     if (!isParticipant) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Get other participant(s)
-    const otherParticipants = conversation.participants.filter(
-      (p) => p.userId !== session.user.id
-    );
+    const otherParticipants = conversation.participants.filter((p) => p.userId !== session.user.id);
 
     // Check for blocks
     for (const participant of otherParticipants) {
@@ -64,10 +57,7 @@ export async function POST(
       });
 
       if (block) {
-        return NextResponse.json(
-          { error: "Cannot send message to this user" },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: 'Cannot send message to this user' }, { status: 403 });
       }
     }
 
@@ -91,7 +81,7 @@ export async function POST(
 
     return NextResponse.json(message, { status: 201 });
   } catch (error) {
-    console.error("Error sending message:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error sending message:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

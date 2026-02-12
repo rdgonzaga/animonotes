@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/features/auth/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 // GET /api/conversations/[id] - Get conversation with messages
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const conversation = await prisma.conversation.findUnique({
@@ -39,28 +36,26 @@ export async function GET(
             },
           },
           orderBy: {
-            createdAt: "asc",
+            createdAt: 'asc',
           },
         },
       },
     });
 
     if (!conversation) {
-      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     }
 
     // Check if user is a participant
-    const isParticipant = conversation.participants.some(
-      (p) => p.userId === session.user.id
-    );
+    const isParticipant = conversation.participants.some((p) => p.userId === session.user.id);
 
     if (!isParticipant) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     return NextResponse.json(conversation);
   } catch (error) {
-    console.error("Error fetching conversation:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching conversation:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

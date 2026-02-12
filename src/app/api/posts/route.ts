@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { createPostSchema } from '@/lib/validations/post';
 
 // GET /api/posts - List posts with pagination and filtering

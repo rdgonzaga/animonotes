@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 
 // PATCH /api/reports/[id] - Update report status (admin only)
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

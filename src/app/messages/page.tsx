@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
-import { ConversationList } from '@/components/messages/conversation-list';
+import { auth } from '@/features/auth/lib/auth';
+import { ConversationList } from '@/features/messages/components/conversation-list';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare } from 'lucide-react';
 

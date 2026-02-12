@@ -1,22 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/features/auth/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 // POST /api/users/[id]/block - Block user
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Cannot block yourself
     if (id === session.user.id) {
-      return NextResponse.json({ error: "Cannot block yourself" }, { status: 400 });
+      return NextResponse.json({ error: 'Cannot block yourself' }, { status: 400 });
     }
 
     // Check if user exists
@@ -25,7 +22,7 @@ export async function POST(
     });
 
     if (!userToBlock) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check if already blocked
@@ -39,7 +36,7 @@ export async function POST(
     });
 
     if (existingBlock) {
-      return NextResponse.json({ error: "User already blocked" }, { status: 409 });
+      return NextResponse.json({ error: 'User already blocked' }, { status: 409 });
     }
 
     // Create block
@@ -52,8 +49,8 @@ export async function POST(
 
     return NextResponse.json(block, { status: 201 });
   } catch (error) {
-    console.error("Error blocking user:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error blocking user:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -62,11 +59,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+  const { id } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Find and delete block
@@ -80,7 +77,7 @@ export async function DELETE(
     });
 
     if (!block) {
-      return NextResponse.json({ error: "User not blocked" }, { status: 404 });
+      return NextResponse.json({ error: 'User not blocked' }, { status: 404 });
     }
 
     await prisma.block.delete({
@@ -89,9 +86,9 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({ message: "User unblocked" });
+    return NextResponse.json({ message: 'User unblocked' });
   } catch (error) {
-    console.error("Error unblocking user:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error unblocking user:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

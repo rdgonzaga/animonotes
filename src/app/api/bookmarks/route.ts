@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/features/auth/lib/auth';
 
 // GET /api/bookmarks - Get user's bookmarks
 export async function GET(request: NextRequest) {

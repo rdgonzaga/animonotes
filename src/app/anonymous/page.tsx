@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AnonPostCard } from '@/components/anonymous/anon-post-card';
-import { AnonDisclaimer } from '@/components/anonymous/anon-disclaimer';
+import { AnonPostCard } from '@/features/anonymous/components/anon-post-card';
+import { AnonDisclaimer } from '@/features/anonymous/components/anon-disclaimer';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Shield, PenLine } from 'lucide-react';
 import { prisma } from '@/lib/prisma';

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TiptapEditor } from '@/components/editor/tiptap-editor';
+import { TiptapEditor } from '@/features/editor/components/tiptap-editor';
 
 export default function EditPostPage() {
   const { data: session, status } = useSession();

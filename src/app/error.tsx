@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, RotateCcw } from "lucide-react";
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { AlertCircle, RotateCcw } from 'lucide-react';
 
 export default function Error({
   error,

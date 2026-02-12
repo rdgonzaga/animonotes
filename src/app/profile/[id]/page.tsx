@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { prisma } from '@/lib/prisma';
-import { SendMessageButton } from '@/components/messages/send-message-button';
+import { SendMessageButton } from '@/features/messages/components/send-message-button';
 
 export const dynamic = 'force-dynamic';
 
