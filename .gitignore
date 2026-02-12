@@ -41,33 +41,12 @@ yarn-error.log*
 /blob-report/
 /playwright/.cache/
 
-# OS
-Thumbs.db
 
 /src/generated/prisma
-
-# Test reports and internal docs
-test-reports/
-.sisyphus/
-
-# Design assets (optional - large files)
-figma/
-
-# Development databases
-dev.db
-dev.db-journal
-*.sqlite
-*.sqlite3
-
-# Windows artifacts
-nul
 
 # TypeScript build cache
 tsconfig.tsbuildinfo
 
-# Docker environment (secrets)
+# Docker environment)
 docker-compose.env
 
-# Additional env patterns
-.env.production
-.env.staging
