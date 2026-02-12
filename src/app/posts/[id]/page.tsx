@@ -11,6 +11,8 @@ import { ReportButton } from '@/components/moderation/report-button';
 import { CommentList } from '@/components/comments/comment-list';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Sidebar } from '@/components/layout/sidebar';
+import { format } from 'date-fns';
 
 async function getPost(id: string) {
   try {
@@ -97,66 +99,80 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   const isAuthor = session?.user?.id === post.authorId;
 
   return (
-    <div className="max-w-4xl mx-auto w-full py-8 px-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-start gap-2 sm:gap-4">
-            <VoteButtons
-              targetId={post.id}
-              targetType="post"
-              initialScore={post.score}
-              initialUserVote={userVote}
-            />
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-4">{post.title}</h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-                {post.author ? (
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={post.author.image || undefined} />
-                      <AvatarFallback>{post.author.name?.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <Link href={`/profile/${post.author.id}`} className="hover:underline">
-                      {post.author.name}
-                    </Link>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto w-full px-4 py-6">
+        <div className="flex gap-6">
+          {/* Left Sidebar — Desktop only */}
+          <Sidebar />
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <div className="max-w-4xl mx-auto w-full py-8 px-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-start gap-2 sm:gap-4">
+                    <VoteButtons
+                      targetId={post.id}
+                      targetType="post"
+                      initialScore={post.score}
+                      initialUserVote={userVote}
+                    />
+                    <div className="flex-1">
+                      <h1 className="text-2xl sm:text-3xl font-bold mb-4">{post.title}</h1>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+                        {post.author ? (
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={post.author.image || undefined} />
+                              <AvatarFallback>
+                                {post.author.name?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <Link href={`/profile/${post.author.id}`} className="hover:underline">
+                              {post.author.name}
+                            </Link>
+                          </div>
+                        ) : (
+                          <span>Anonymous</span>
+                        )}
+                        <span>•</span>
+                        <span>{format(new Date(post.createdAt), 'MMM d, yyyy')}</span>
+                        <span>•</span>
+                        <CategoryBadge name={post.category.name} slug={post.category.slug} />
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <span>Anonymous</span>
-                )}
-                <span>•</span>
-                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                <span>•</span>
-                <CategoryBadge name={post.category.name} slug={post.category.slug} />
+                </CardHeader>
+                <CardContent>
+                  <div
+                    className="prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
+
+                  <div className="mt-6 pt-6 border-t flex gap-2 items-center flex-wrap">
+                    <BookmarkButton postId={post.id} initialBookmarked={userBookmarked} />
+                    <ShareButton url={`/posts/${post.id}`} title={post.title} />
+                    <ReportButton targetId={post.id} targetType="post" />
+                    {isAuthor && (
+                      <Link href={`/posts/${post.id}/edit`}>
+                        <Button variant="outline">Edit Post</Button>
+                      </Link>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold mb-4">Comments</h2>
+                <Card>
+                  <CardContent className="pt-6">
+                    <CommentList postId={post.id} />
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div
-            className="prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-
-          <div className="mt-6 pt-6 border-t flex gap-2 items-center flex-wrap">
-            <BookmarkButton postId={post.id} initialBookmarked={userBookmarked} />
-            <ShareButton url={`/posts/${post.id}`} title={post.title} />
-            <ReportButton targetId={post.id} targetType="post" />
-            {isAuthor && (
-              <Link href={`/posts/${post.id}/edit`}>
-                <Button variant="outline">Edit Post</Button>
-              </Link>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Comments</h2>
-        <Card>
-          <CardContent className="pt-6">
-            <CommentList postId={post.id} />
-          </CardContent>
-        </Card>
+        </div>
       </div>
     </div>
   );
