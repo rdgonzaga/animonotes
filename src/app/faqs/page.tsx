@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Sidebar } from '@/components/layout/sidebar';
 
 const faqs = [
   {
@@ -45,39 +46,44 @@ const faqs = [
 
 export default function FAQsPage() {
   return (
-    <div className="max-w-4xl mx-auto w-full py-8 px-4">
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">
-          Frequently Asked Questions
-        </h1>
-        <p className="text-muted-foreground">Everything you need to know about Animo Notes</p>
-        <span className="accent-line" />
-      </div>
+    <div className="max-w-7xl mx-auto w-full px-4 py-6">
+      <div className="flex gap-6">
+        <Sidebar />
+        <div className="flex-1 min-w-0">
+          <div className="mb-8">
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">
+              Frequently Asked Questions
+            </h1>
+            <p className="text-muted-foreground">Everything you need to know about Animo Notes</p>
+            <span className="accent-line" />
+          </div>
 
-      <div className="space-y-4">
-        {faqs.map((faq, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <h2 className="text-lg font-semibold">{faq.question}</h2>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{faq.answer}</p>
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <h2 className="text-lg font-semibold">{faq.question}</h2>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="mt-8 border-dashed">
+            <CardContent className="py-8 text-center">
+              <p className="text-muted-foreground">
+                Still have questions? Reach out to us through the{' '}
+                <a href="/about" className="text-primary hover:underline">
+                  Contact page
+                </a>
+                .
+              </p>
             </CardContent>
           </Card>
-        ))}
+        </div>
       </div>
-
-      <Card className="mt-8 border-dashed">
-        <CardContent className="py-8 text-center">
-          <p className="text-muted-foreground">
-            Still have questions? Reach out to us through the{' '}
-            <a href="/about" className="text-primary hover:underline">
-              Contact page
-            </a>
-            .
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

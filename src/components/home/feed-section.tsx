@@ -155,26 +155,26 @@ export function FeedSection({ posts, categories }: FeedSectionProps) {
             className="group hover:shadow-md transition-all duration-200 overflow-hidden"
           >
             <CardContent className="p-4 md:p-5">
-              {/* Top row: bookmark + more */}
-              <div className="flex justify-end gap-1 mb-2">
-                <BookmarkButton postId={post.id} />
-                <PostCardMenu postId={post.id} postTitle={post.title} />
-              </div>
-
               <div className="flex gap-4">
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   {/* Author row */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={post.author?.image || undefined} />
-                      <AvatarFallback className="text-xs bg-muted text-muted-foreground">
-                        {post.author?.name?.charAt(0).toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-semibold">
-                      {post.author?.name || 'Anonymous'}
-                    </span>
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={post.author?.image || undefined} />
+                        <AvatarFallback className="text-xs bg-muted text-muted-foreground">
+                          {post.author?.name?.charAt(0).toUpperCase() || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-semibold">
+                        {post.author?.name || 'Anonymous'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 -mt-1">
+                      <BookmarkButton postId={post.id} />
+                      <PostCardMenu postId={post.id} postTitle={post.title} />
+                    </div>
                   </div>
 
                   {/* Title */}
