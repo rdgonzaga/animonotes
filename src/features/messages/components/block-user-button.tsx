@@ -12,13 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Ban, ShieldOff } from 'lucide-react';
-
-interface BlockUserButtonProps {
-  userId: string;
-  userName: string;
-  isBlocked?: boolean;
-  onBlockChange?: () => void;
-}
+import type { BlockUserButtonProps } from '../types/block-user-button';
 
 export function BlockUserButton({
   userId,

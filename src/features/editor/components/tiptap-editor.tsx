@@ -19,14 +19,9 @@ import {
   Link2,
   Image as ImageIcon,
 } from 'lucide-react';
+import type { TiptapEditorProps } from '../types/tiptap-editor';
 
 const lowlight = createLowlight(common);
-
-interface TiptapEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
-}
 
 export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);

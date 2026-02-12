@@ -5,15 +5,11 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-react';
+import type { BookmarkButtonProps, CacheState } from '../types/bookmark-button';
 
 // ─── Shared bookmark cache ──────────────────────────────────────────────────
 // Module-level singleton: one fetch for ALL BookmarkButton instances on the page.
 // Uses useSyncExternalStore for tear-free reads.
-
-type CacheState = {
-  ids: Set<string>;
-  status: 'idle' | 'loading' | 'ready' | 'error';
-};
 
 let cache: CacheState = { ids: new Set(), status: 'idle' };
 let listeners = new Set<() => void>();
@@ -72,12 +68,6 @@ function removeFromCache(postId: string) {
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
-
-interface BookmarkButtonProps {
-  postId: string;
-  /** When explicitly known (e.g. post detail page), skip the cache fetch. */
-  initialBookmarked?: boolean;
-}
 
 export function BookmarkButton({ postId, initialBookmarked }: BookmarkButtonProps) {
   const { data: session } = useSession();

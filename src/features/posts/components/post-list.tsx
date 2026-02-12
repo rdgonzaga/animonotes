@@ -9,14 +9,7 @@ import { Button } from '@/components/ui/button';
 import { BookmarkButton } from '@/features/bookmarks/components/bookmark-button';
 import { PostCardMenu } from '@/features/home/components/post-card-menu';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
-
-interface PostListProps {
-  posts: any[];
-  emptyMessage?: {
-    title: string;
-    description: string;
-  };
-}
+import type { PostListProps } from '../types/post-list';
 
 export function PostList({ posts, emptyMessage }: PostListProps) {
   const defaultEmpty = {

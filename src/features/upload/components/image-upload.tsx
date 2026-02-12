@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { Button } from '@/components/ui/button';
 import { Upload, X } from "lucide-react";
-
-interface ImageUploadProps {
-  onUpload: (url: string) => void;
-  onRemove?: () => void;
-  currentUrl?: string;
-}
+import type { ImageUploadProps } from '../types/image-upload';
 
 export function ImageUpload({ onUpload, onRemove, currentUrl }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);

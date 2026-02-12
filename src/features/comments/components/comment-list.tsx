@@ -7,32 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { CommentThread } from './comment-thread';
 import { useSSE } from '@/hooks/useSSE';
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: {
-    id: string;
-    name: string;
-    image: string | null;
-  } | null;
-  score: number;
-  parentId: string | null;
-  _count: {
-    replies: number;
-  };
-  children?: Comment[];
-}
-
-interface CommentListProps {
-  postId: string;
-}
+import type { CommentBase, CommentListProps, CommentWithChildren } from '../types/comment';
 
 export function CommentList({ postId }: CommentListProps) {
   const { data: session } = useSession();
   const router = useRouter();
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentWithChildren[]>([]);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -46,7 +26,7 @@ export function CommentList({ postId }: CommentListProps) {
     'comment-new',
     (data) => {
       // Only update if this is for our post
-      const commentData = data as { postId: string; comment: Comment };
+      const commentData = data as { postId: string; comment: CommentBase };
       if (commentData.postId === postId) {
         // Add new comment to the list
         setComments((prev) => [...prev, commentData.comment]);
@@ -113,9 +93,9 @@ export function CommentList({ postId }: CommentListProps) {
   };
 
   // Build comment tree
-  const buildTree = (comments: Comment[]) => {
-    const map = new Map<string, Comment & { children: Comment[] }>();
-    const roots: (Comment & { children: Comment[] })[] = [];
+  const buildTree = (comments: CommentWithChildren[]) => {
+    const map = new Map<string, CommentWithChildren & { children: CommentWithChildren[] }>();
+    const roots: (CommentWithChildren & { children: CommentWithChildren[] })[] = [];
 
     // Initialize map
     comments.forEach((comment) => {
@@ -140,7 +120,7 @@ export function CommentList({ postId }: CommentListProps) {
     return roots;
   };
 
-  const renderCommentTree = (comment: Comment, depth = 0) => {
+  const renderCommentTree = (comment: CommentWithChildren, depth = 0) => {
     return (
       <div key={comment.id}>
         <CommentThread comment={comment} postId={postId} depth={depth} onReply={handleReply} />

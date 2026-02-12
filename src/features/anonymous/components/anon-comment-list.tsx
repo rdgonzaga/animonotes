@@ -4,31 +4,10 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { AnonCommentCard } from './anon-comment-card';
-
-interface AnonComment {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: {
-    id: string;
-    name: string;
-    image: string | null;
-  } | null;
-  isAnonymous: boolean;
-  score: number;
-  parentId: string | null;
-  _count: {
-    replies: number;
-  };
-  children?: AnonComment[];
-}
-
-interface AnonCommentListProps {
-  postId: string;
-}
+import type { AnonCommentListProps, AnonCommentWithChildren } from '../types/anon-comment';
 
 export function AnonCommentList({ postId }: AnonCommentListProps) {
-  const [comments, setComments] = useState<AnonComment[]>([]);
+  const [comments, setComments] = useState<AnonCommentWithChildren[]>([]);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -83,9 +62,12 @@ export function AnonCommentList({ postId }: AnonCommentListProps) {
   };
 
   // Build comment tree
-  const buildTree = (comments: AnonComment[]) => {
-    const map = new Map<string, AnonComment & { children: AnonComment[] }>();
-    const roots: (AnonComment & { children: AnonComment[] })[] = [];
+  const buildTree = (comments: AnonCommentWithChildren[]) => {
+    const map = new Map<
+      string,
+      AnonCommentWithChildren & { children: AnonCommentWithChildren[] }
+    >();
+    const roots: (AnonCommentWithChildren & { children: AnonCommentWithChildren[] })[] = [];
 
     // Initialize map
     comments.forEach((comment) => {
@@ -110,7 +92,7 @@ export function AnonCommentList({ postId }: AnonCommentListProps) {
     return roots;
   };
 
-  const renderCommentTree = (comment: AnonComment, depth = 0) => {
+  const renderCommentTree = (comment: AnonCommentWithChildren, depth = 0) => {
     return (
       <div key={comment.id}>
         <AnonCommentCard comment={comment} postId={postId} depth={depth} onReply={handleReply} />

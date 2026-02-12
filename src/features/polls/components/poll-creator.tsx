@@ -6,16 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { X, Plus } from 'lucide-react';
-
-interface PollCreatorProps {
-  onPollDataChange: (
-    pollData: {
-      question: string;
-      options: string[];
-      endsAt?: string;
-    } | null
-  ) => void;
-}
+import type { PollCreatorProps } from '../types/poll-creator';
 
 export function PollCreator({ onPollDataChange }: PollCreatorProps) {
   const [enabled, setEnabled] = useState(false);

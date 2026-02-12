@@ -1,11 +1,6 @@
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-
-interface CategoryBadgeProps {
-  name: string;
-  slug: string;
-  variant?: 'default' | 'secondary' | 'outline';
-}
+import type { CategoryBadgeProps } from '../types/category';
 
 export function CategoryBadge({ name, slug, variant = 'secondary' }: CategoryBadgeProps) {
   return (

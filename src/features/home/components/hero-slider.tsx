@@ -3,19 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-interface FeaturedPost {
-  id: string;
-  title: string;
-  content: string;
-  image?: string | null;
-  author?: { id: string; name: string | null; image: string | null } | null;
-  category?: { id: string; name: string; slug: string } | null;
-}
-
-interface HeroSliderProps {
-  featuredPosts: FeaturedPost[];
-}
+import type { HeroSliderProps } from '../types/hero-slider';
 
 export function HeroSlider({ featuredPosts }: HeroSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);

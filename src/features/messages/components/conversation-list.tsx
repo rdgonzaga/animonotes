@@ -4,35 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-
-interface User {
-  id: string;
-  name: string | null;
-  image: string | null;
-}
-
-interface Message {
-  id: string;
-  content: string;
-  createdAt: string;
-  sender: User;
-}
-
-interface Participant {
-  userId: string;
-  user: User;
-}
-
-interface Conversation {
-  id: string;
-  createdAt: string;
-  participants: Participant[];
-  messages: Message[];
-}
-
-interface ConversationListProps {
-  currentUserId: string;
-}
+import type { ConversationListProps } from '../types/conversation-list';
+import type { Conversation } from '../types/models';
 
 export function ConversationList({ currentUserId }: ConversationListProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);

@@ -7,22 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSSE } from '@/hooks/useSSE';
 import { formatDistanceToNow } from 'date-fns';
-
-interface NotificationData {
-  authorName?: string;
-  voterName?: string;
-  targetType?: string;
-  senderName?: string;
-  [key: string]: unknown;
-}
-
-interface Notification {
-  id: string;
-  type: string;
-  data: NotificationData;
-  read: boolean;
-  createdAt: string;
-}
+import type { Notification, NotificationData } from '../types/notification-bell';
 
 export function NotificationBell() {
   const { data: session } = useSession();

@@ -12,11 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Share2, Copy, Check } from "lucide-react";
-
-interface ShareButtonProps {
-  url: string;
-  title: string;
-}
+import type { ShareButtonProps } from '../types/share-button';
 
 export function ShareButton({ url, title }: ShareButtonProps) {
   const [open, setOpen] = useState(false);

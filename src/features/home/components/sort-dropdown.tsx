@@ -7,19 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-export type SortOption = 'newest' | 'most-voted' | 'most-commented';
+import type { SortDropdownProps, SortOption } from '../types/sort-dropdown';
+export type { SortOption } from '../types/sort-dropdown';
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
   'most-voted': 'Most Voted',
   'most-commented': 'Most Commented',
 };
-
-interface SortDropdownProps {
-  currentSort: SortOption;
-  onSort: (sort: SortOption) => void;
-}
 
 export function SortDropdown({ currentSort, onSort }: SortDropdownProps) {
   return (

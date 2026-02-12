@@ -4,11 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send } from 'lucide-react';
-
-interface MessageInputProps {
-  conversationId: string;
-  onMessageSent: () => void;
-}
+import type { MessageInputProps } from '../types/message-input';
 
 export function MessageInput({ conversationId, onMessageSent }: MessageInputProps) {
   const [content, setContent] = useState('');

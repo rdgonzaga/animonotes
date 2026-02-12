@@ -4,11 +4,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { MessageSquare } from 'lucide-react';
-
-interface SendMessageButtonProps {
-  recipientId: string;
-  recipientName: string;
-}
+import type { SendMessageButtonProps } from '../types/send-message-button';
 
 export function SendMessageButton({ recipientId, recipientName }: SendMessageButtonProps) {
   const { data: session } = useSession();

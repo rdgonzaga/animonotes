@@ -7,23 +7,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { PollResults } from './poll-results';
-
-interface PollOption {
-  id: string;
-  text: string;
-  order: number;
-}
-
-interface Poll {
-  id: string;
-  question: string;
-  endsAt: string | null;
-  options: PollOption[];
-}
-
-interface PollDisplayProps {
-  poll: Poll;
-}
+import type { PollDisplayProps } from '../types/poll-display';
 
 export function PollDisplay({ poll }: PollDisplayProps) {
   const { data: session } = useSession();

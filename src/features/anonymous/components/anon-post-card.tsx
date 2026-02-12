@@ -2,28 +2,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { UserX } from 'lucide-react';
-
-interface AnonPost {
-  id: string;
-  title: string;
-  content: string;
-  categoryId: string;
-  createdAt: string;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  _count: {
-    comments: number;
-    votes: number;
-  };
-  score: number;
-}
-
-interface AnonPostCardProps {
-  post: AnonPost;
-}
+import type { AnonPostCardProps } from '../types/anon-post';
 
 export function AnonPostCard({ post }: AnonPostCardProps) {
   return (

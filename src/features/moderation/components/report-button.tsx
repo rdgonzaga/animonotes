@@ -14,11 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Flag } from 'lucide-react';
-
-interface ReportButtonProps {
-  targetId: string;
-  targetType: 'post' | 'comment' | 'user';
-}
+import type { ReportButtonProps } from '../types/report-button';
 
 export function ReportButton({ targetId, targetType }: ReportButtonProps) {
   const { data: session } = useSession();

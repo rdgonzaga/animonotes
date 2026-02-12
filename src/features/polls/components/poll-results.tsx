@@ -2,25 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface PollOption {
-  id: string;
-  text: string;
-  voteCount: number;
-  percentage: number;
-}
-
-interface PollResults {
-  id: string;
-  question: string;
-  endsAt: string | null;
-  totalVotes: number;
-  options: PollOption[];
-}
-
-interface PollResultsProps {
-  pollId: string;
-}
+import type { PollResults, PollResultsProps } from '../types/poll-results';
 
 export function PollResults({ pollId }: PollResultsProps) {
   const [results, setResults] = useState<PollResults | null>(null);

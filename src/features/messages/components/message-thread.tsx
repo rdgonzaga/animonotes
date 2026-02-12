@@ -3,23 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { useSession } from 'next-auth/react';
-
-interface User {
-  id: string;
-  name: string | null;
-  image: string | null;
-}
-
-interface Message {
-  id: string;
-  content: string;
-  createdAt: string;
-  sender: User;
-}
-
-interface MessageThreadProps {
-  messages: Message[];
-}
+import type { MessageThreadProps } from '../types/message-thread';
+import type { MessageItem } from '../types/models';
 
 export function MessageThread({ messages }: MessageThreadProps) {
   const { data: session } = useSession();
@@ -34,7 +19,7 @@ export function MessageThread({ messages }: MessageThreadProps) {
 
   return (
     <div className="space-y-4">
-      {messages.map((message) => {
+      {messages.map((message: MessageItem) => {
         const isOwnMessage = message.sender.id === session?.user?.id;
 
         return (

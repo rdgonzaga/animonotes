@@ -5,31 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import { UserX } from 'lucide-react';
-
-interface AnonComment {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: {
-    id: string;
-    name: string;
-    image: string | null;
-  } | null;
-  isAnonymous: boolean;
-  score: number;
-  parentId: string | null;
-  _count: {
-    replies: number;
-  };
-}
-
-interface AnonCommentCardProps {
-  comment: AnonComment;
-  postId: string;
-  depth?: number;
-  onReply: (commentId: string, content: string) => Promise<void>;
-  userVote?: number | null;
-}
+import type { AnonCommentCardProps } from '../types/anon-comment';
 
 export function AnonCommentCard({
   comment,

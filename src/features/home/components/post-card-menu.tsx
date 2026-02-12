@@ -20,11 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-
-interface PostCardMenuProps {
-  postId: string;
-  postTitle: string;
-}
+import type { PostCardMenuProps } from '../types/post-card-menu';
 
 export function PostCardMenu({ postId, postTitle }: PostCardMenuProps) {
   const { data: session } = useSession();

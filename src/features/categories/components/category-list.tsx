@@ -2,17 +2,7 @@
 
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-}
-
-interface CategoryListProps {
-  categories: Category[];
-}
+import type { CategoryListProps } from '../types/category';
 
 export function CategoryList({ categories }: CategoryListProps) {
   return (

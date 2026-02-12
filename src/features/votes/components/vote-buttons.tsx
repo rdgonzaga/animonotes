@@ -6,14 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useSSE } from '@/hooks/useSSE';
-
-interface VoteButtonsProps {
-  targetId: string;
-  targetType: 'post' | 'comment';
-  initialScore: number;
-  initialUserVote?: number | null;
-  postId?: string; // For SSE channel subscription
-}
+import type { VoteButtonsProps } from '../types/vote-buttons';
 
 export function VoteButtons({
   targetId,

@@ -7,30 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: {
-    id: string;
-    name: string;
-    image: string | null;
-  } | null;
-  score: number;
-  parentId: string | null;
-  _count: {
-    replies: number;
-  };
-}
-
-interface CommentThreadProps {
-  comment: Comment;
-  postId: string;
-  depth?: number;
-  onReply: (commentId: string, content: string) => Promise<void>;
-  userVote?: number | null;
-}
+import type { CommentThreadProps } from '../types/comment';
 
 export function CommentThread({
   comment,

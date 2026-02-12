@@ -9,31 +9,7 @@ import { Calendar, Eye, MessageSquare } from 'lucide-react';
 import { BookmarkButton } from '@/features/bookmarks/components/bookmark-button';
 import { PostCardMenu } from '@/features/home/components/post-card-menu';
 import { SortDropdown, type SortOption } from '@/features/home/components/sort-dropdown';
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  image?: string | null;
-  createdAt: string | Date;
-  score: number;
-  author?: { id: string; name: string | null; image: string | null } | null;
-  category?: { id: string; name: string; slug: string } | null;
-  _count?: { comments: number; votes: number };
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-type TabFilter = 'for-you' | 'trending' | 'by-category';
-
-interface FeedSectionProps {
-  posts: Post[];
-  categories: Category[];
-}
+import type { FeedSectionProps, FeedPost, TabFilter } from '../types/feed-section';
 
 export function FeedSection({ posts, categories }: FeedSectionProps) {
   const [activeTab, setActiveTab] = useState<TabFilter>('for-you');
@@ -150,7 +126,7 @@ export function FeedSection({ posts, categories }: FeedSectionProps) {
           </CardContent>
         </Card>
       ) : (
-        filteredAndSortedPosts.map((post) => (
+        filteredAndSortedPosts.map((post: FeedPost) => (
           <Card
             key={post.id}
             className="group hover:shadow-md transition-all duration-200 overflow-hidden"
