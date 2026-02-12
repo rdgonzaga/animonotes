@@ -1,6 +1,6 @@
 export type {
-	CommentBase,
-	CommentListProps,
-	CommentThreadProps,
-	CommentWithChildren,
+  CommentBase,
+  CommentListProps,
+  CommentThreadProps,
+  CommentWithChildren,
 } from './comment';

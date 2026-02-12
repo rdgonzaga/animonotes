@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, X } from "lucide-react";
+import { Upload, X } from 'lucide-react';
 import type { ImageUploadProps } from '../types/image-upload';
 
 export function ImageUpload({ onUpload, onRemove, currentUrl }: ImageUploadProps) {
@@ -15,13 +15,13 @@ export function ImageUpload({ onUpload, onRemove, currentUrl }: ImageUploadProps
 
     // Validate file size
     if (file.size > 10 * 1024 * 1024) {
-      setError("File too large (max 10MB)");
+      setError('File too large (max 10MB)');
       return;
     }
 
     // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
       return;
     }
 
@@ -30,22 +30,22 @@ export function ImageUpload({ onUpload, onRemove, currentUrl }: ImageUploadProps
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
-      const response = await fetch("/api/upload", {
-        method: "POST",
+      const response = await fetch('/api/upload', {
+        method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Upload failed");
+        throw new Error(data.error || 'Upload failed');
       }
 
       const data = await response.json();
       onUpload(data.url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
     }
@@ -55,11 +55,7 @@ export function ImageUpload({ onUpload, onRemove, currentUrl }: ImageUploadProps
     <div className="space-y-2">
       {currentUrl ? (
         <div className="relative inline-block">
-          <img
-            src={currentUrl}
-            alt="Uploaded"
-            className="max-w-xs rounded-lg border"
-          />
+          <img src={currentUrl} alt="Uploaded" className="max-w-xs rounded-lg border" />
           {onRemove && (
             <Button
               type="button"
@@ -83,18 +79,14 @@ export function ImageUpload({ onUpload, onRemove, currentUrl }: ImageUploadProps
             id="image-upload"
           />
           <label htmlFor="image-upload" className="cursor-pointer">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={uploading}
-            >
+            <Button type="button" variant="outline" disabled={uploading}>
               <Upload className="mr-2 h-4 w-4" />
-              {uploading ? "Uploading..." : "Upload Image"}
+              {uploading ? 'Uploading...' : 'Upload Image'}
             </Button>
           </label>
         </div>
       )}
-      {error && <p className="text-sm text-red-500'>{error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
 }

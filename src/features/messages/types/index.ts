@@ -1,9 +1,4 @@
-export type {
-	Conversation,
-	ConversationParticipant,
-	MessageItem,
-	MessageUser,
-} from './models';
+export type { Conversation, ConversationParticipant, MessageItem, MessageUser } from './models';
 export type { ConversationListProps } from './conversation-list';
 export type { MessageThreadProps } from './message-thread';
 export type { MessageInputProps } from './message-input';
