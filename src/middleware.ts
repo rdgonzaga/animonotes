@@ -1,18 +1,18 @@
-import { auth } from "./auth";
-import { NextResponse } from "next/server";
+import { auth } from './auth';
+import { NextResponse } from 'next/server';
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isAuthenticated = !!req.auth;
 
   // Protected routes that require authentication
-  const protectedRoutes = ["/dashboard", "/settings"];
+  const protectedRoutes = ['/dashboard', '/settings'];
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
   // Redirect unauthenticated users to login
   if (isProtectedRoute && !isAuthenticated) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -28,6 +28,6 @@ export const config = {
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      * - public folder
      */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.gif$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.gif$).*)',
   ],
 };
