@@ -36,20 +36,7 @@ const CATEGORY_DATA = [
   },
 ];
 
-const USER_NAMES = [
-  'Alex Cruz',
-  'Bea Santos',
-  'Carlo Dizon',
-  'Dana Reyes',
-  'Eli Navarro',
-  'Faye Lim',
-  'Gio Tan',
-  'Hana Yu',
-  'Ivan Lee',
-  'Jules Kim',
-  'Kai Lopez',
-  'Mira Chan',
-];
+const USER_NAMES = ['Duncan Marcaida', 'Elkan La Madrid', 'Mariel Yasumuro', 'Rainer Gonzaga'];
 
 const TITLE_SNIPPETS = [
   'Study tips for finals week',
@@ -159,8 +146,8 @@ async function main() {
   const testUser = await prisma.user.create({
     data: {
       email: 'test@animonotes.app',
-      name: 'Test User',
-      image: pickOne(PROFILE_IMAGES),
+      name: 'Raikan Joriel Yasgonlarcaida',
+      image: PROFILE_IMAGES[0],
       password: hashedPassword,
       securityQuestion: 'What is your favorite city?',
       securityAnswer: hashedAnswer,
@@ -175,7 +162,7 @@ async function main() {
     const user = await prisma.user.create({
       data: {
         email,
-        image: pickOne(PROFILE_IMAGES),
+        image: PROFILE_IMAGES[i],
         name,
         password: hashedPassword,
         securityQuestion: 'What is your favorite city?',
@@ -219,7 +206,7 @@ async function main() {
       const author = pickOne(users);
       await prisma.comment.create({
         data: {
-          content: `<p>I like this topic. Here is my quick take #${i + 1}.</p>`,
+          content: `I like this topic. Here is my quick take #${i + 1}.`,
           authorId: author.id,
           postId: post.id,
         },

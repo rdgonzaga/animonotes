@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
@@ -143,6 +143,7 @@ export default async function HomePage() {
                   <Link key={post.id} href={`/posts/${post.id}`} className="block group">
                     <div className="flex items-start gap-2">
                       <Avatar className="h-5 w-5 mt-0.5">
+                        <AvatarImage src={post.author?.image || undefined} />
                         <AvatarFallback className="text-[10px] bg-muted">
                           {post.author?.name?.charAt(0) || '?'}
                         </AvatarFallback>
@@ -216,6 +217,7 @@ export default async function HomePage() {
                       >
                         <div className="flex items-start gap-2">
                           <Avatar className="h-5 w-5 mt-0.5">
+                            <AvatarImage src={bookmark.post.author?.image || undefined} />
                             <AvatarFallback className="text-[10px] bg-muted">
                               {bookmark.post.author?.name?.charAt(0) || '?'}
                             </AvatarFallback>
