@@ -1,8 +1,97 @@
-# Animo Notes - Note-Sharing Platform
+# AnimoNotes
+
+A modern note-sharing forum for students built with Next.js, Prisma, and Tailwind.
+
+## Features
+
+- Auth with Google OAuth and email/password (security question recovery)
+- Profiles with soft-delete support
+- Posts with rich text, images, and categories
+- Threaded comments (limited depth)
+- Votes and bookmarks
+- Search across posts and users
+- Anonymous posts and Q&A flow
+- Polls with voting and results
+- Messages with blocking rules
+- Notifications and reports (admin-only report actions)
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- Prisma 6 + PostgreSQL
+- Auth.js v5 (next-auth beta)
+- TailwindCSS v4 + shadcn/ui
+- Tiptap editor + Lucide icons
+
+## Local Development
+
+1. Install deps
+
+```bash
+npm install
+```
+
+2. Create a `.env` file
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/animonotes?schema=public"
+AUTH_SECRET="your-secret"
+NEXTAUTH_URL="http://localhost:3000"
+GOOGLE_CLIENT_ID="optional"
+GOOGLE_CLIENT_SECRET="optional"
+```
+
+3. Start Postgres
+
+```bash
+docker compose -f docker-compose.animonotes.yml up -d postgres
+```
+
+4. Migrate and seed
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+
+5. Run the app
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000
+
+## Docker (App + DB)
+
+```bash
+docker compose -f docker-compose.animonotes.yml up --build
+```
+
+The app will be on http://localhost:3002
+
+## Scripts
+
+- `npm run dev` - start dev server
+- `npm run lint` - lint
+- `npm run build` - production build
+- `npm run db:migrate` - migrate (dev)
+- `npm run db:seed` - seed data
+- `npm run db:studio` - Prisma Studio
+
+## Project Structure
+
+````
+src/
+  app/          # App Router, pages, API routes
+  components/   # UI and feature components
+  hooks/        # Client hooks
+  lib/          # Prisma, auth, utils, validations
+```# Animo Notes - Note-Sharing Platform
 
 A modern, full-stack forum application built with Next.js 16, featuring rich text editing, threaded discussions, and social engagement features.
 
-## 🎯 Project Status: 59% Complete (13/22 tasks)
+## 🎯 Project Status:
 
 ### ✅ Implemented Features
 
@@ -40,7 +129,6 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
 ### Fresh Device Setup (Recommended)
 
 1. **Install prerequisites:**
-
    - Node.js 18+
    - Docker + Docker Compose
 
@@ -50,7 +138,7 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
    git clone <your-repo-url>
    cd animonotes
    npm install
-   ```
+````
 
 3. **Create env files:**
 
@@ -87,7 +175,6 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
    ```
 
 7. **Open in browser:**
-
    - http://localhost:3000
 
 ### Prerequisites
