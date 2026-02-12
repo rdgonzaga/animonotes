@@ -1,7 +1,7 @@
 {
-  "name": "hase-forum",
+  "name": "animonotes",
   "version": "1.0.0",
-  "description": "A modern forum for thoughtful discussion",
+  "description": "A modern note-sharing platform for students",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -26,7 +26,6 @@
   "license": "MIT",
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
-    "@prisma/client": "^7.4.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -67,7 +66,6 @@
     "eslint-config-next": "^16.1.6",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
-    "prisma": "^6.19.2",
     "tailwindcss": "^4.1.18"
   }
 }
