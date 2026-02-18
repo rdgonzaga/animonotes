@@ -15,6 +15,10 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   emailAndPassword: {
     enabled: true,
+    password: {
+      hash: async (password) => bcrypt.hash(password, 10),
+      verify: async ({ hash, password }) => bcrypt.compare(password, hash),
+    },
   },
   socialProviders: hasGoogle
     ? {
@@ -39,6 +43,24 @@ export const auth = betterAuth({
         type: 'string',
         required: false,
       },
+    },
+  },
+  account: {
+    fields: {
+      providerId: 'provider',
+      accountId: 'providerAccountId',
+      refreshToken: 'refresh_token',
+      accessToken: 'access_token',
+      accessTokenExpiresAt: 'expires_at',
+      tokenType: 'token_type',
+      idToken: 'id_token',
+      sessionState: 'session_state',
+    },
+  },
+  session: {
+    fields: {
+      token: 'sessionToken',
+      expiresAt: 'expires',
     },
   },
   databaseHooks: {

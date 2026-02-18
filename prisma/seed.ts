@@ -143,32 +143,57 @@ async function main() {
 
   const users = [] as { id: string; name: string | null }[];
 
-  const testUser = await prisma.user.create({
-    data: {
-      email: 'test@animonotes.app',
-      name: 'Raikan Joriel Yasgonlarcaida',
-      image: PROFILE_IMAGES[0],
-      password: hashedPassword,
-      securityQuestion: 'What is your favorite city?',
-      securityAnswer: hashedAnswer,
-      role: 'user',
-    },
+  const createSeedUser = async (data: {
+    email: string;
+    name: string;
+    image: string;
+    role: 'user' | 'moderator' | 'admin';
+  }) => {
+    const email = data.email.toLowerCase();
+
+    return prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email,
+          name: data.name,
+          image: data.image,
+          password: hashedPassword,
+          securityQuestion: 'What is your favorite city?',
+          securityAnswer: hashedAnswer,
+          role: data.role,
+        },
+      });
+
+      await tx.account.create({
+        data: {
+          userId: user.id,
+          type: 'credentials',
+          provider: 'credential',
+          providerAccountId: email,
+          password: hashedPassword,
+        },
+      });
+
+      return user;
+    });
+  };
+
+  const testUser = await createSeedUser({
+    email: 'test@animonotes.app',
+    name: 'Raikan Joriel Yasgonlarcaida',
+    image: PROFILE_IMAGES[0],
+    role: 'user',
   });
   users.push({ id: testUser.id, name: testUser.name });
 
   for (let i = 0; i < USER_NAMES.length; i += 1) {
     const name = USER_NAMES[i];
     const email = `user${i + 1}@animonotes.app`;
-    const user = await prisma.user.create({
-      data: {
-        email,
-        image: PROFILE_IMAGES[i],
-        name,
-        password: hashedPassword,
-        securityQuestion: 'What is your favorite city?',
-        securityAnswer: hashedAnswer,
-        role: 'user',
-      },
+    const user = await createSeedUser({
+      email,
+      image: PROFILE_IMAGES[i],
+      name,
+      role: 'user',
     });
     users.push({ id: user.id, name: user.name });
   }
