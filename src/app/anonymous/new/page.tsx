@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TiptapEditor } from '@/components/editor/tiptap-editor';
-import { AnonDisclaimer } from '@/components/anonymous/anon-disclaimer';
+import { TiptapEditor } from '@/features/editor/components/tiptap-editor';
+import { AnonDisclaimer } from '@/features/anonymous/components/anon-disclaimer';
 
 export default function NewAnonymousPostPage() {
   const router = useRouter();

@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TiptapEditor } from '@/components/editor/tiptap-editor';
-import { ImageUpload } from '@/components/upload/image-upload';
+import { TiptapEditor } from '@/features/editor/components/tiptap-editor';
+import { ImageUpload } from '@/features/upload/components/image-upload';
+import { authClient } from '@/lib/auth-client';
 
 export default function NewPostPage() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const [categories, setCategories] = useState<any[]>([]);
   const [formData, setFormData] = useState({
@@ -25,10 +25,10 @@ export default function NewPostPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!isPending && !session) {
       router.push('/login');
     }
-  }, [status, router]);
+  }, [isPending, session, router]);
 
   useEffect(() => {
     fetch('/api/categories')
@@ -68,7 +68,7 @@ export default function NewPostPage() {
     }
   };
 
-  if (status === 'loading') {
+  if (isPending) {
     return <div className="container py-8">Loading...</div>;
   }
 

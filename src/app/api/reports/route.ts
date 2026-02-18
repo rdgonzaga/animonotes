@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { createReportSchema } from '@/lib/validations/report';
 
 // POST /api/reports - Create report
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -59,7 +61,9 @@ export async function POST(request: NextRequest) {
 // GET /api/reports - Get reports (admin only)
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     const isAdmin = session?.user?.role?.toLowerCase() === 'admin';
     if (!session?.user || !isAdmin) {

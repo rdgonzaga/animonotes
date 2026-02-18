@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageThread } from '@/components/messages/message-thread';
-import { MessageInput } from '@/components/messages/message-input';
-import { BlockUserButton } from '@/components/messages/block-user-button';
+import { MessageThread } from '@/features/messages/components/message-thread';
+import { MessageInput } from '@/features/messages/components/message-input';
+import { BlockUserButton } from '@/features/messages/components/block-user-button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 
 interface User {
   id: string;
@@ -39,7 +39,7 @@ interface Conversation {
 export default function ConversationPage() {
   const params = useParams();
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,13 +47,13 @@ export default function ConversationPage() {
   const conversationId = params.id as string;
 
   useEffect(() => {
-    if (status === 'loading') return;
+    if (isPending) return;
     if (!session?.user) {
       router.push('/login?callbackUrl=/messages');
       return;
     }
     fetchConversation();
-  }, [status, session, conversationId]);
+  }, [isPending, session, conversationId]);
 
   const fetchConversation = async () => {
     try {

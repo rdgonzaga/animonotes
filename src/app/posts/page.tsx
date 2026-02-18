@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { Sidebar } from '@/components/layout/sidebar';
-import { PostList } from '@/components/posts/post-list';
+import { PostList } from '@/features/posts/components/post-list';
 
 export const dynamic = 'force-dynamic';
 

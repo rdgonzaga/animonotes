@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TiptapEditor } from '@/components/editor/tiptap-editor';
+import { TiptapEditor } from '@/features/editor/components/tiptap-editor';
+import { authClient } from '@/lib/auth-client';
 
 export default function EditPostPage() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const params = useParams();
   const postId = params.id as string;
@@ -26,31 +26,33 @@ export default function EditPostPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isPending) {
+      return;
+    }
+
+    if (!session?.user) {
       router.push('/login');
       return;
     }
 
-    if (status === 'authenticated') {
-      // Fetch post and categories
-      Promise.all([
-        fetch(`/api/posts/${postId}`).then((res) => res.json()),
-        fetch('/api/categories').then((res) => res.json()),
-      ]).then(([post, cats]) => {
-        if (post.authorId !== session.user.id) {
-          router.push(`/posts/${postId}`);
-          return;
-        }
-        setFormData({
-          title: post.title,
-          content: post.content,
-          categoryId: post.categoryId,
-        });
-        setCategories(cats);
-        setLoading(false);
+    // Fetch post and categories
+    Promise.all([
+      fetch(`/api/posts/${postId}`).then((res) => res.json()),
+      fetch('/api/categories').then((res) => res.json()),
+    ]).then(([post, cats]) => {
+      if (post.authorId !== session.user.id) {
+        router.push(`/posts/${postId}`);
+        return;
+      }
+      setFormData({
+        title: post.title,
+        content: post.content,
+        categoryId: post.categoryId,
       });
-    }
-  }, [status, session, postId, router]);
+      setCategories(cats);
+      setLoading(false);
+    });
+  }, [isPending, session, postId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

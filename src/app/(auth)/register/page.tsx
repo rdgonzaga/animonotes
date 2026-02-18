@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { authClient } from '@/lib/auth-client';
 
 const SECURITY_QUESTIONS = [
   "What is your mother's maiden name?",
@@ -18,6 +19,10 @@ const SECURITY_QUESTIONS = [
 
 export default function RegisterPage() {
   const router = useRouter();
+  type SignUpPayload = Parameters<typeof authClient.signUp.email>[0] & {
+    securityQuestion: string;
+    securityAnswer: string;
+  };
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -33,22 +38,25 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const name = formData.email.split('@')[0] || 'User';
+      const signUpPayload: SignUpPayload = {
+        name,
+        email: formData.email,
+        password: formData.password,
+        securityQuestion: formData.securityQuestion,
+        securityAnswer: formData.securityAnswer,
+      };
 
-      const data = await response.json();
+      const { error: signUpError } = await authClient.signUp.email(signUpPayload);
 
-      if (!response.ok) {
-        setError(data.error || 'Registration failed');
+      if (signUpError) {
+        setError(signUpError.message || 'Registration failed');
         setLoading(false);
         return;
       }
 
       router.push('/login?registered=true');
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
       setLoading(false);
     }

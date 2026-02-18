@@ -1,32 +1,25 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { sseBroadcaster } from "@/lib/sse-broadcaster";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/features/auth/lib/auth';
+import { sseBroadcaster } from '@/lib/sse-broadcaster';
 
 // POST /api/comments/[id]/vote - Vote on comment
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
-    const session = await auth();
-    
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { value } = body; // 1 for upvote, -1 for downvote
 
     if (value !== 1 && value !== -1) {
-      return NextResponse.json(
-        { error: "Invalid vote value. Must be 1 or -1" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid vote value. Must be 1 or -1' }, { status: 400 });
     }
 
     // Check if comment exists
@@ -35,10 +28,7 @@ export async function POST(
     });
 
     if (!comment || comment.deletedAt) {
-      return NextResponse.json(
-        { error: "Comment not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
     }
 
     // Check existing vote
@@ -74,7 +64,7 @@ export async function POST(
           },
         });
         newScore = await calculateNewScore();
-        
+
         // Broadcast vote update via SSE
         sseBroadcaster.broadcast({
           type: 'vote-update',
@@ -86,8 +76,8 @@ export async function POST(
           },
           channel: `post-${comment.postId}`,
         });
-        
-        return NextResponse.json({ message: "Vote removed", value: 0, score: newScore });
+
+        return NextResponse.json({ message: 'Vote removed', value: 0, score: newScore });
       } else {
         // Change vote
         await prisma.vote.update({
@@ -100,7 +90,7 @@ export async function POST(
           data: { value },
         });
         newScore = await calculateNewScore();
-        
+
         // Broadcast vote update via SSE
         sseBroadcaster.broadcast({
           type: 'vote-update',
@@ -112,8 +102,8 @@ export async function POST(
           },
           channel: `post-${comment.postId}`,
         });
-        
-        return NextResponse.json({ message: "Vote updated", value, score: newScore });
+
+        return NextResponse.json({ message: 'Vote updated', value, score: newScore });
       }
     } else {
       // Create new vote
@@ -125,7 +115,7 @@ export async function POST(
         },
       });
       newScore = await calculateNewScore();
-      
+
       // Broadcast vote update via SSE
       sseBroadcaster.broadcast({
         type: 'vote-update',
@@ -137,15 +127,12 @@ export async function POST(
         },
         channel: `post-${comment.postId}`,
       });
-      
-      return NextResponse.json({ message: "Vote created", value, score: newScore });
+
+      return NextResponse.json({ message: 'Vote created', value, score: newScore });
     }
   } catch (error) {
-    console.error("Vote error:", error);
-    return NextResponse.json(
-      { error: "Failed to process vote" },
-      { status: 500 }
-    );
+    console.error('Vote error:', error);
+    return NextResponse.json({ error: 'Failed to process vote' }, { status: 500 });
   }
 }
 
@@ -154,15 +141,14 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params;
+  const { id } = await params;
   try {
-    const session = await auth();
-    
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await prisma.vote.deleteMany({
@@ -172,12 +158,9 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({ message: "Vote removed" });
+    return NextResponse.json({ message: 'Vote removed' });
   } catch (error) {
-    console.error("Vote deletion error:", error);
-    return NextResponse.json(
-      { error: "Failed to remove vote" },
-      { status: 500 }
-    );
+    console.error('Vote deletion error:', error);
+    return NextResponse.json({ error: 'Failed to remove vote' }, { status: 500 });
   }
 }

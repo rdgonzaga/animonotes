@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { createPollSchema } from "@/lib/validations/poll";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/features/auth/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { createPollSchema } from '@/lib/validations/poll';
 
 // POST /api/posts/[id]/poll - Create poll for post
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -20,7 +19,7 @@ export async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: validation.error.issues },
+        { error: 'Invalid input', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -34,21 +33,15 @@ export async function POST(
     });
 
     if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
     if (post.authorId !== session.user.id) {
-      return NextResponse.json(
-        { error: "Only the post author can add a poll" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Only the post author can add a poll' }, { status: 403 });
     }
 
     if (post.poll) {
-      return NextResponse.json(
-        { error: "Post already has a poll" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Post already has a poll' }, { status: 409 });
     }
 
     // Create poll with options
@@ -67,7 +60,7 @@ export async function POST(
       include: {
         options: {
           orderBy: {
-            order: "asc",
+            order: 'asc',
           },
         },
       },
@@ -75,7 +68,7 @@ export async function POST(
 
     return NextResponse.json(poll, { status: 201 });
   } catch (error) {
-    console.error("Error creating poll:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error creating poll:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
