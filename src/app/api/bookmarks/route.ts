@@ -5,7 +5,9 @@ import { auth } from '@/features/auth/lib/auth';
 // GET /api/bookmarks - Get user's bookmarks
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
     
     if (!session?.user) {
       return NextResponse.json(

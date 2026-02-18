@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,9 +16,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Sidebar } from '@/components/layout/sidebar';
+import { authClient } from '@/lib/auth-client';
 
 export default function ProfileSettingsPage() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -32,7 +32,7 @@ export default function ProfileSettingsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!isPending && !session) {
       router.push('/login');
     }
     if (session?.user) {
@@ -41,7 +41,7 @@ export default function ProfileSettingsPage() {
         image: session.user.image || '',
       });
     }
-  }, [session, status, router]);
+  }, [session, isPending, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +97,7 @@ export default function ProfileSettingsPage() {
     }
   };
 
-  if (status === 'loading') {
+  if (isPending) {
     return <div className="container py-8">Loading...</div>;
   }
 

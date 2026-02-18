@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import {
   Menu,
@@ -27,11 +26,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LogoutButton } from '@/features/auth/components/logout-button';
+import { authClient } from '@/lib/auth-client';
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 

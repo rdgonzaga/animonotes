@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSSE } from '@/hooks/useSSE';
 import { formatDistanceToNow } from 'date-fns';
 import type { Notification, NotificationData } from '../types/notification-bell';
+import { authClient } from '@/lib/auth-client';
 
 export function NotificationBell() {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);

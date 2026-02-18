@@ -2,12 +2,12 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { useSession } from 'next-auth/react';
 import type { MessageThreadProps } from '../types/message-thread';
 import type { MessageItem } from '../types/models';
+import { authClient } from '@/lib/auth-client';
 
 export function MessageThread({ messages }: MessageThreadProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
 
   if (messages.length === 0) {
     return (

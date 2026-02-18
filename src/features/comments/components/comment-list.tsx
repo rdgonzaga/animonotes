@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { CommentThread } from './comment-thread';
 import { useSSE } from '@/hooks/useSSE';
 import type { CommentBase, CommentListProps, CommentWithChildren } from '../types/comment';
+import { authClient } from '@/lib/auth-client';
 
 export function CommentList({ postId }: CommentListProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const [comments, setComments] = useState<CommentWithChildren[]>([]);
   const [newComment, setNewComment] = useState('');

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-react';
 import type { BookmarkButtonProps, CacheState } from '../types/bookmark-button';
+import { authClient } from '@/lib/auth-client';
 
 // ─── Shared bookmark cache ──────────────────────────────────────────────────
 // Module-level singleton: one fetch for ALL BookmarkButton instances on the page.
@@ -70,7 +70,7 @@ function removeFromCache(postId: string) {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function BookmarkButton({ postId, initialBookmarked }: BookmarkButtonProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const cacheState = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const [loading, setLoading] = useState(false);

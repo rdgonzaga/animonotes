@@ -24,6 +24,7 @@ model User {
   role              String    @default("user") // user, moderator, admin
   emailVerified     DateTime?
   createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now()) @updatedAt
   deletedAt         DateTime? // Soft delete
   
   // Relations
@@ -47,6 +48,8 @@ model User {
 
 model Account {
   id                String  @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
   userId            String
   type              String
   provider          String
@@ -58,6 +61,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
+  password          String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -67,9 +71,13 @@ model Account {
 
 model Session {
   id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
   sessionToken String   @unique
   userId       String
   expires      DateTime
+  ipAddress    String?
+  userAgent    String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

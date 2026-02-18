@@ -6,7 +6,9 @@ import { auth } from '@/features/auth/lib/auth';
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     const isAdmin = session?.user?.role?.toLowerCase() === 'admin';
     if (!session?.user || !isAdmin) {

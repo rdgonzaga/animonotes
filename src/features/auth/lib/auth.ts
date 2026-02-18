@@ -1,5 +1,5 @@
 /**
  * Auth utility functions
- * Re-exports auth functions from src/auth.ts for easy import in app directory
+ * Re-exports Better Auth instance for app directory imports
  */
-export { handlers, auth, signIn, signOut } from '../../../auth';
+export { auth } from '../../../auth';

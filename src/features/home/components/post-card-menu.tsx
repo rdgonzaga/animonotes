@@ -18,12 +18,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import type { PostCardMenuProps } from '../types/post-card-menu';
+import { authClient } from '@/lib/auth-client';
 
 export function PostCardMenu({ postId, postTitle }: PostCardMenuProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const [shareOpen, setShareOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
