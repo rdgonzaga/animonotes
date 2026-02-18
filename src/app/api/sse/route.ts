@@ -10,7 +10,9 @@ import { auth } from '@/features/auth/lib/auth';
  * - channels: Comma-separated list of channels to subscribe to (e.g., "post-123,comments-123")
  */
 export async function GET(request: NextRequest) {
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
   const userId = session?.user?.id;
 
   // Get channels from query params

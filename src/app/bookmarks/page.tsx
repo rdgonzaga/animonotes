@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Sidebar } from '@/components/layout/sidebar';
+import { headers } from 'next/headers';
 
 async function getBookmarks(userId: string) {
   try {
@@ -70,7 +71,9 @@ async function getBookmarks(userId: string) {
 }
 
 export default async function BookmarksPage() {
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user?.id) {
     redirect('/login');

@@ -8,10 +8,11 @@ import { AnonDisclaimer } from '@/features/anonymous/components/anon-disclaimer'
 import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { UserX } from 'lucide-react';
+import { headers } from 'next/headers';
 
 async function getAnonymousPost(id: string) {
   const res = await fetch(
-    `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/anonymous/posts/${id}`,
+    `${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/api/anonymous/posts/${id}`,
     {
       cache: 'no-store',
     }
@@ -35,7 +36,12 @@ async function getUserVote(postId: string, userId: string | undefined) {
 
 export default async function AnonymousPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [post, session] = await Promise.all([getAnonymousPost(id), auth()]);
+  const [post, session] = await Promise.all([
+    getAnonymousPost(id),
+    auth.api.getSession({
+      headers: await headers(),
+    }),
+  ]);
 
   if (!post) {
     notFound();

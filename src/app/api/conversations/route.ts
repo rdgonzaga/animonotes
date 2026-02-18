@@ -4,9 +4,11 @@ import { prisma } from '@/lib/prisma';
 import { createConversationSchema } from '@/lib/validations/message';
 
 // GET /api/conversations - List user's conversations
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -81,7 +83,9 @@ export async function GET() {
 // POST /api/conversations - Create new conversation
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

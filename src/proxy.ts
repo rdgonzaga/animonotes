@@ -1,9 +1,10 @@
-import { auth } from './auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getSessionCookie } from 'better-auth/cookies';
 
-export default auth((req) => {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isAuthenticated = !!req.auth;
+  const sessionCookie = getSessionCookie(req);
+  const isAuthenticated = !!sessionCookie;
 
   // Protected routes that require authentication
   const protectedRoutes = ['/dashboard', '/settings'];
@@ -17,7 +18,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [

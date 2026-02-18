@@ -3,9 +3,11 @@ import { prisma } from '@/lib/prisma';
 import { auth } from '@/features/auth/lib/auth';
 
 // GET /api/bookmarks/ids - Get just the post IDs the user has bookmarked (lightweight)
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

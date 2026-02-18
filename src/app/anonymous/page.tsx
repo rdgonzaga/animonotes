@@ -27,7 +27,7 @@ async function getAnonymousPosts() {
     ]);
 
     const postsWithScores = await Promise.all(
-      posts.map(async (post) => {
+      posts.map(async (post: (typeof posts)[number]) => {
         const votes = await prisma.vote.findMany({
           where: { postId: post.id },
           select: { value: true },
