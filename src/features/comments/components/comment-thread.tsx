@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import type { CommentThreadProps } from '../types/comment';
+import { authClient } from '@/lib/auth-client';
 
 export function CommentThread({
   comment,
@@ -16,7 +16,7 @@ export function CommentThread({
   onReply,
   userVote,
 }: CommentThreadProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [submitting, setSubmitting] = useState(false);

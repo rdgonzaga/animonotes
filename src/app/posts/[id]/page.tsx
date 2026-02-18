@@ -13,6 +13,7 @@ import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Sidebar } from '@/components/layout/sidebar';
 import { format } from 'date-fns';
+import { headers } from 'next/headers';
 
 async function getPost(id: string) {
   try {
@@ -86,7 +87,12 @@ async function getUserBookmark(postId: string, userId: string | undefined) {
 
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [post, session] = await Promise.all([getPost(id), auth()]);
+  const [post, session] = await Promise.all([
+    getPost(id),
+    auth.api.getSession({
+      headers: await headers(),
+    }),
+  ]);
 
   if (!post) {
     notFound();

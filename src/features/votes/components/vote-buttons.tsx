@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useSSE } from '@/hooks/useSSE';
 import type { VoteButtonsProps } from '../types/vote-buttons';
+import { authClient } from '@/lib/auth-client';
 
 export function VoteButtons({
   targetId,
@@ -15,7 +15,7 @@ export function VoteButtons({
   initialUserVote,
   postId,
 }: VoteButtonsProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const [score, setScore] = useState(initialScore);
   const [userVote, setUserVote] = useState(initialUserVote || 0);

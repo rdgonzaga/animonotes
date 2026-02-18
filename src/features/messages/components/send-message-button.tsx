@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { MessageSquare } from 'lucide-react';
 import type { SendMessageButtonProps } from '../types/send-message-button';
+import { authClient } from '@/lib/auth-client';
 
 export function SendMessageButton({ recipientId, recipientName }: SendMessageButtonProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const [loading, setLoading] = useState(false);
 
   // Don't show if not logged in or viewing own profile

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,9 +14,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Flag } from 'lucide-react';
 import type { ReportButtonProps } from '../types/report-button';
+import { authClient } from '@/lib/auth-client';
 
 export function ReportButton({ targetId, targetType }: ReportButtonProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');

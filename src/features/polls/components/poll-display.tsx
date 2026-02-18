@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { PollResults } from './poll-results';
 import type { PollDisplayProps } from '../types/poll-display';
+import { authClient } from '@/lib/auth-client';
 
 export function PollDisplay({ poll }: PollDisplayProps) {
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [hasVoted, setHasVoted] = useState(false);
   const [loading, setLoading] = useState(false);
