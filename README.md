@@ -19,7 +19,7 @@ A modern note-sharing forum for students built with Next.js, Prisma, and Tailwin
 
 - Next.js 16 (App Router)
 - Prisma 6 + PostgreSQL
-- Auth.js v5 (next-auth beta)
+- Better Auth
 - TailwindCSS v4 + shadcn/ui
 - Tiptap editor + Lucide icons
 
@@ -36,7 +36,7 @@ npm install
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5433/animonotes?schema=public"
 AUTH_SECRET="your-secret"
-NEXTAUTH_URL="http://localhost:3000"
+BETTER_AUTH_URL="http://localhost:3000"
 GOOGLE_CLIENT_ID="optional"
 GOOGLE_CLIENT_SECRET="optional"
 ```
@@ -119,7 +119,7 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
 
 - **Framework**: Next.js 16.1.6 (App Router)
 - **Database**: Prisma 7 + PostgreSQL
-- **Auth**: Auth.js v5 (next-auth@beta)
+- **Auth**: Better Auth
 - **UI**: TailwindCSS v4 + shadcn/ui
 - **Editor**: Tiptap with extensions
 - **Icons**: Lucide React
@@ -152,7 +152,7 @@ A modern, full-stack forum application built with Next.js 16, featuring rich tex
    ```env
    DATABASE_URL="postgresql://postgres:postgres@localhost:5433/animonotes?schema=public"
    AUTH_SECRET="your-secret"
-   NEXTAUTH_URL="http://localhost:3000"
+   BETTER_AUTH_URL="http://localhost:3000"
    ```
 
 4. **Start Postgres (local dev):**
@@ -306,7 +306,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/hase_forum"
 AUTH_SECRET="your-secret-key"
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
-NEXTAUTH_URL="http://localhost:3000"
+BETTER_AUTH_URL="http://localhost:3000"
 ```
 
 ## 📁 Project Structure
