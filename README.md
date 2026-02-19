@@ -1,37 +1,36 @@
 # AnimoNotes
 
-A modern note-sharing forum for students built with Next.js, Prisma, and Tailwind.
+A modern note-sharing forum for students built with Next.js, Better Auth, Prisma, and Tailwind CSS.
 
 ## Features
 
-- Auth with Google OAuth and email/password (security question recovery)
+- Google OAuth for DLSU Gmail (not yet finished)
 - Profiles with soft-delete support
-- Posts with rich text, images, and categories
-- Threaded comments (limited depth)
-- Votes and bookmarks
-- Search across posts and users
-- Anonymous posts and Q&A flow
-- Polls with voting and results
-- Messages with blocking rules
-- Notifications and reports (admin-only report actions)
+- Posts with rich text, images, categories, votes, and bookmarks
+- Threaded comments, polls, notifications, messages, and reporting tools
 
 ## Tech Stack
 
-- Next.js 16 (App Router)
-- Prisma 6 + PostgreSQL
+- Next.js 16 (App Router + Proxy)
 - Better Auth
-- TailwindCSS v4 + shadcn/ui
+- Prisma 6 + PostgreSQL
+- Tailwind CSS v4 + shadcn/ui
 - Tiptap editor + Lucide icons
+
+## Prerequisites
+
+- Node.js 18+
+- Docker + Docker Compose
 
 ## Local Development
 
-1. Install deps
+1. Install dependencies
 
 ```bash
 npm install
 ```
 
-2. Create a `.env` file
+2. Create `.env`
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5433/animonotes?schema=public"
@@ -47,14 +46,19 @@ GOOGLE_CLIENT_SECRET="optional"
 docker compose -f docker-compose.animonotes.yml up -d postgres
 ```
 
-4. Migrate and seed
+4. Apply migrations
 
 ```bash
 npx prisma migrate deploy
-npx prisma db seed
 ```
 
-5. Run the app
+5. Seed data
+
+```bash
+npm run db:seed
+```
+
+6. Start the app
 
 ```bash
 npm run dev
@@ -62,338 +66,47 @@ npm run dev
 
 Open http://localhost:3000
 
+### Seeded Login (for testing)
+
+- Email: `test@animonotes.app`
+- Password: `password123`
+
 ## Docker (App + DB)
 
 ```bash
 docker compose -f docker-compose.animonotes.yml up --build
 ```
 
-The app will be on http://localhost:3002
+App URL: http://localhost:3002
 
 ## Scripts
 
-- `npm run dev` - start dev server
-- `npm run lint` - lint
-- `npm run build` - production build
-- `npm run db:migrate` - migrate (dev)
-- `npm run db:seed` - seed data
-- `npm run db:studio` - Prisma Studio
+- `npm run dev` — start dev server
+- `npm run build` — production build
+- `npm run start` — run production server
+- `npm run lint` — lint project
+- `npm run format` — format project
+- `npm run db:generate` — generate Prisma client
+- `npm run db:migrate` — create/apply migration in dev
+- `npm run db:push` — push schema without migration
+- `npm run db:seed` — seed database (`tsx prisma/seed.ts`)
+- `npm run db:studio` — open Prisma Studio
 
 ## Project Structure
 
-````
+```text
 src/
-  app/          # App Router, pages, API routes
-  components/   # UI and feature components
-  hooks/        # Client hooks
-  lib/          # Prisma, auth, utils, validations
-```# Animo Notes - Note-Sharing Platform
-
-A modern, full-stack forum application built with Next.js 16, featuring rich text editing, threaded discussions, and social engagement features.
-
-## 🎯 Project Status:
-
-### ✅ Implemented Features
-
-- **Authentication**: Google OAuth + Email/Password with security questions
-- **User Profiles**: View, edit, delete with soft delete pattern
-- **Posts**: Rich text editor (Tiptap), CRUD operations, pagination
-- **Comments**: Threaded discussions with 5-level depth limit
-- **Voting**: Upvote/downvote for posts and comments
-- **Bookmarks**: Save posts for later
-- **Categories**: 6 academic categories (Math, Science, History, Literature, Languages, General)
-- **Search**: Find posts and users
-- **Sharing**: Social media integration (Twitter, Facebook, LinkedIn, Reddit)
-
-### 🚧 Remaining Tasks
-
-- File/Image Uploads (requires Uploadthing API)
-- Real-time features (requires Pusher API)
-- DMs with blocking
-- Anonymous Q&A section
-- Polls
-- Moderation system
-- Dark mode
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 16.1.6 (App Router)
-- **Database**: Prisma 7 + PostgreSQL
-- **Auth**: Better Auth
-- **UI**: TailwindCSS v4 + shadcn/ui
-- **Editor**: Tiptap with extensions
-- **Icons**: Lucide React
-
-## 🚀 Getting Started
-
-### Fresh Device Setup (Recommended)
-
-1. **Install prerequisites:**
-   - Node.js 18+
-   - Docker + Docker Compose
-
-2. **Clone and install:**
-
-   ```bash
-   git clone <your-repo-url>
-   cd animonotes
-   npm install
-````
-
-3. **Create env files:**
-
-   ```bash
-   copy docker-compose.env.example docker-compose.env
-   copy .env.example .env
-   ```
-
-   Update `.env` to match your local setup. Example:
-
-   ```env
-   DATABASE_URL="postgresql://postgres:postgres@localhost:5433/animonotes?schema=public"
-   AUTH_SECRET="your-secret"
-   BETTER_AUTH_URL="http://localhost:3000"
-   ```
-
-4. **Start Postgres (local dev):**
-
-   ```bash
-   docker-compose -f docker-compose.animonotes.yml up -d
-   ```
-
-5. **Run migrations and seed:**
-
-   ```bash
-   npx prisma migrate deploy
-   npx prisma db seed
-   ```
-
-6. **Start the app:**
-
-   ```bash
-   npm run dev
-   ```
-
-7. **Open in browser:**
-   - http://localhost:3000
-
-### Prerequisites
-
-- Node.js 18+
-- Docker and Docker Compose (for local PostgreSQL)
-- Google OAuth credentials (optional)
-
-### Local Development Setup
-
-#### Database Setup with Docker
-
-1. **Start PostgreSQL container:**
-
-   ```bash
-   docker-compose up -d
-   ```
-
-2. **Verify database is healthy:**
-
-   ```bash
-   docker-compose ps
-   ```
-
-   The `postgres` service should show `healthy` status.
-
-3. **Run migrations:**
-
-   ```bash
-   npx prisma migrate deploy
-   ```
-
-4. **Seed the database (optional):**
-
-   ```bash
-   npm run db:seed
-   ```
-
-5. **Stop the database when done:**
-   ```bash
-   docker-compose down
-   ```
-
-**Note:** The database credentials for local development are:
-
-- User: `postgres`
-- Password: `postgres`
-- Database: `hase_forum`
-- Port: `5432`
-
-These are configured in `docker-compose.yml` and `.env.local.example`.
-
-### Docker Setup (Complete Application)
-
-Run the entire application (Next.js app + PostgreSQL database) in Docker containers:
-
-1. **Build and start all services:**
-
-   ```bash
-   docker-compose up --build
-   ```
-
-2. **Access the application:**
-   - Open your browser and navigate to `http://localhost:3002`
-   - The application will automatically:
-     - Start the PostgreSQL database
-     - Run database migrations
-     - Seed the database with categories
-     - Start the Next.js application
-
-3. **View logs:**
-
-   ```bash
-   docker-compose logs -f app
-   ```
-
-4. **Stop all services:**
-
-   ```bash
-   docker-compose down
-   ```
-
-5. **Remove volumes (reset database):**
-   ```bash
-   docker-compose down -v
-   ```
-
-**Docker Services:**
-
-- **app**: Next.js application running on port 3002 (maps to internal port 3000)
-- **postgres**: PostgreSQL database running on port 5432
-
-**Features:**
-
-- Multi-stage Docker build for optimized image size
-- Automatic database migrations on startup
-- Automatic database seeding with categories
-- Health checks for both services
-- Persistent database volume
-- Production-ready configuration
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.local.example .env.local
-# Edit .env.local with your database URL and auth secrets
-
-# Run database migrations
-npx prisma migrate dev
-
-# Seed categories
-npm run db:seed
-
-# Start development server
-npm run dev
+  app/          # App Router pages + API routes
+  components/   # Shared UI components
+  features/     # Domain-based feature modules
+  hooks/        # Reusable hooks
+  lib/          # Prisma/auth/utils/validation
+prisma/
+  schema.prisma
+  seed.ts
 ```
 
-### Environment Variables
+## Notes
 
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/hase_forum"
-
-# Auth
-AUTH_SECRET="your-secret-key"
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-BETTER_AUTH_URL="http://localhost:3000"
-```
-
-## 📁 Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Auth pages
-│   ├── api/               # API routes
-│   ├── posts/             # Post pages
-│   ├── profile/           # User profiles
-│   └── search/            # Search
-├── components/            # React components
-│   ├── ui/                # shadcn/ui components
-│   ├── comments/          # Comment system
-│   ├── votes/             # Voting system
-│   └── ...
-└── lib/                   # Utilities
-    ├── prisma.ts          # Database client
-    ├── auth.ts            # Auth utilities
-    └── validations/       # Zod schemas
-```
-
-## 🧰 Scripts
-
-```bash
-# Run linter
-npm run lint
-
-# Build for production
-npm run build
-```
-
-## 📊 Database Schema
-
-19 Prisma models including:
-
-- User, Account, Session (Auth)
-- Post, Comment, Vote, Bookmark (Content)
-- Category, Tag (Organization)
-- Poll, PollOption, PollVote (Polls)
-- Conversation, Message, Block (Messaging)
-- Report, Notification (Moderation)
-
-## 🎨 Design
-
-- **Theme**: Modern Editorial
-- **Colors**: Warm, editorial aesthetic
-- **Typography**: Instrument Serif (display) + Outfit (body)
-- **Components**: shadcn/ui (owned, customizable)
-
-## 📝 API Routes
-
-- `/api/auth/*` - Authentication
-- `/api/posts` - Post CRUD
-- `/api/posts/[id]/comments` - Comments
-- `/api/posts/[id]/vote` - Voting
-- `/api/posts/[id]/bookmark` - Bookmarks
-- `/api/users/[id]` - User profiles
-- `/api/categories` - Categories
-- `/api/search` - Search
-
-## 🔒 Security Features
-
-- Password hashing (bcrypt)
-- Security questions for password recovery
-- JWT session management
-- Input validation (Zod)
-- XSS prevention
-- Soft delete pattern
-- Auth middleware
-
-## 🤝 Contributing
-
-This is a learning project. Feel free to fork and experiment!
-
-## 📄 License
-
-MIT
-
-## 🙏 Acknowledgments
-
-- Next.js team for the amazing framework
-- shadcn for the beautiful UI components
-- Tiptap for the rich text editor
-- Prisma for the excellent ORM
-
----
-
-**Built with ❤️ using Next.js, Prisma, and TailwindCSS**
+- Auth routes are served under `/api/auth/*` by Better Auth.
+- Prisma seed command is configured in `prisma.config.ts` and exposed via `npm run db:seed`.
