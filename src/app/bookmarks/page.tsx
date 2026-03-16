@@ -3,10 +3,9 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from '@/lib/session';
 import { Sidebar } from '@/components/layout/sidebar';
-import { headers } from 'next/headers';
 
 async function getBookmarks(userId: string) {
   try {
@@ -71,9 +70,7 @@ async function getBookmarks(userId: string) {
 }
 
 export default async function BookmarksPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession();
 
   if (!session?.user?.id) {
     redirect('/login');

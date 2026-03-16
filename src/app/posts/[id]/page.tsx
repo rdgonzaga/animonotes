@@ -9,11 +9,10 @@ import { BookmarkButton } from '@/features/bookmarks/components/bookmark-button'
 import { ShareButton } from '@/features/share/components/share-button';
 import { ReportButton } from '@/features/moderation/components/report-button';
 import { CommentList } from '@/features/comments/components/comment-list';
-import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from '@/lib/session';
 import { Sidebar } from '@/components/layout/sidebar';
 import { format } from 'date-fns';
-import { headers } from 'next/headers';
 
 async function getPost(id: string) {
   try {
@@ -89,9 +88,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const [post, session] = await Promise.all([
     getPost(id),
-    auth.api.getSession({
-      headers: await headers(),
-    }),
+    getServerSession(),
   ]);
 
   if (!post) {

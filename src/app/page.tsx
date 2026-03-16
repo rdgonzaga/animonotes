@@ -3,9 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowRight } from 'lucide-react';
-import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/features/auth/lib/auth';
+import { getServerSession } from '@/lib/session';
 import { HeroSlider } from '@/features/home/components/hero-slider';
 import { Sidebar } from '@/components/layout/sidebar';
 import { PostList } from '@/features/posts/components/post-list';
@@ -58,9 +57,7 @@ async function getCategories() {
 
 async function getBookmarkedPosts() {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getServerSession();
 
     if (!session?.user) {
       return { bookmarks: [], isAuthenticated: false };

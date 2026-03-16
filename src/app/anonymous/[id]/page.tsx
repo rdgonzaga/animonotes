@@ -5,10 +5,9 @@ import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import { ShareButton } from '@/features/share/components/share-button';
 import { AnonCommentList } from '@/features/anonymous/components/anon-comment-list';
 import { AnonDisclaimer } from '@/features/anonymous/components/anon-disclaimer';
-import { auth } from '@/features/auth/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from '@/lib/session';
 import { UserX } from 'lucide-react';
-import { headers } from 'next/headers';
 
 async function getAnonymousPost(id: string) {
   const res = await fetch(
@@ -38,9 +37,7 @@ export default async function AnonymousPostPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const [post, session] = await Promise.all([
     getAnonymousPost(id),
-    auth.api.getSession({
-      headers: await headers(),
-    }),
+    getServerSession(),
   ]);
 
   if (!post) {

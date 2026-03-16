@@ -1,10 +1,9 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { auth } from '@/features/auth/lib/auth';
+import { getServerSession } from '@/lib/session';
 import { ConversationList } from '@/features/messages/components/conversation-list';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare } from 'lucide-react';
-import { headers } from 'next/headers';
 
 export const metadata = {
   title: 'Messages - Animo Notes',
@@ -12,9 +11,7 @@ export const metadata = {
 };
 
 export default async function MessagesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession();
 
   if (!session?.user) {
     redirect('/login?callbackUrl=/messages');
