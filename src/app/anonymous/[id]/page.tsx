@@ -35,10 +35,7 @@ async function getUserVote(postId: string, userId: string | undefined) {
 
 export default async function AnonymousPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [post, session] = await Promise.all([
-    getAnonymousPost(id),
-    getServerSession(),
-  ]);
+  const [post, session] = await Promise.all([getAnonymousPost(id), getServerSession()]);
 
   if (!post) {
     notFound();
