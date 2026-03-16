@@ -14,6 +14,7 @@ export function VoteButtons({
   initialScore,
   initialUserVote,
   postId,
+  enableRealtime = true,
 }: VoteButtonsProps) {
   const { data: session } = authClient.useSession();
   const router = useRouter();
@@ -41,6 +42,7 @@ export function VoteButtons({
     },
     {
       channels: channelId ? [`post-${channelId}`] : [],
+      enabled: enableRealtime,
     }
   );
 

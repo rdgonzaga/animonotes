@@ -4,4 +4,5 @@ export interface VoteButtonsProps {
   initialScore: number;
   initialUserVote?: number | null;
   postId?: string;
+  enableRealtime?: boolean;
 }

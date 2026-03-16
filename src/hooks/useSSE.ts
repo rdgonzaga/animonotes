@@ -11,6 +11,7 @@ export interface UseSSEOptions {
   onDisconnected?: () => void;
   reconnect?: boolean;
   reconnectInterval?: number;
+  enabled?: boolean;
 }
 
 /**
@@ -33,6 +34,7 @@ export function useSSE(eventType: string, handler: SSEEventHandler, options: Use
     onDisconnected,
     reconnect = true,
     reconnectInterval = 3000,
+    enabled = true,
   } = options;
 
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -40,6 +42,9 @@ export function useSSE(eventType: string, handler: SSEEventHandler, options: Use
   const isManualCloseRef = useRef(false);
 
   const connect = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
     // Clean up existing connection
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -104,10 +109,26 @@ export function useSSE(eventType: string, handler: SSEEventHandler, options: Use
     onDisconnected,
     reconnect,
     reconnectInterval,
+    enabled,
   ]);
 
   // Establish connection on mount
   useEffect(() => {
+    if (!enabled) {
+      isManualCloseRef.current = true;
+
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+
+      return;
+    }
+
     isManualCloseRef.current = false;
     connect();
 
@@ -124,7 +145,7 @@ export function useSSE(eventType: string, handler: SSEEventHandler, options: Use
         eventSourceRef.current = null;
       }
     };
-  }, [connect]);
+  }, [connect, enabled]);
 
   // Return connection control methods
   return {

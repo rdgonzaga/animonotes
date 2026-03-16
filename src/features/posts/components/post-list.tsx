@@ -45,7 +45,12 @@ export function PostList({ posts, emptyMessage }: PostListProps) {
             <div className="flex gap-4">
               {/* Content */}
               <div className="flex items-center justify-center w-10">
-                <VoteButtons targetId={post.id} targetType="post" initialScore={post.score} />
+                <VoteButtons
+                  targetId={post.id}
+                  targetType="post"
+                  initialScore={post.score}
+                  enableRealtime={false}
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-end gap-1 md:hidden">
