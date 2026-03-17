@@ -3,6 +3,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Navbar } from '@/components/layout/navbar';
 import { BottomTabs } from '@/components/layout/bottom-tabs';
+import { AnnouncementBanner } from '@/features/admin/components/announcement-banner';
 
 export const metadata: Metadata = {
   title: 'Animo Notes',
@@ -27,6 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <div className="relative flex min-h-screen flex-col">
             <Navbar />
+            {/* Don't show announcement banner on admin pages */}
+            <AnnouncementBanner />
             <main className="flex-1 pb-16 md:pb-0">{children}</main>
             <footer className="hidden md:block border-t border-border bg-background">
               <div className="max-w-7xl mx-auto w-full px-4 py-8">

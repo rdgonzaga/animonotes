@@ -143,82 +143,104 @@ export function Navbar() {
                   <DropdownMenuItem>Bookmarks</DropdownMenuItem>
                 </Link>
                 <Link href="/messages">
-                  <DropdownMenuItem>Messages</DropdownMenuItem>
-                </Link>
-                <Link href="/settings/profile">
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <LogoutButton />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="sm" className="bg-white text-primary hover:bg-white/90 rounded-lg">
-                  Register
-                </Button>
-              </Link>
-            </div>
-          )}
-        </div>
+                   <DropdownMenuItem>Messages</DropdownMenuItem>
+                 </Link>
+                 <Link href="/settings/profile">
+                   <DropdownMenuItem>Settings</DropdownMenuItem>
+                 </Link>
+                 {(session.user as Record<string, unknown>).role === 'admin' || (session.user as Record<string, unknown>).role === 'moderator' ? (
+                   <>
+                     <DropdownMenuSeparator />
+                     <Link href="/admin">
+                       <DropdownMenuItem className="text-primary font-medium">
+                         <Shield className="h-4 w-4 mr-2" />
+                         Admin Dashboard
+                       </DropdownMenuItem>
+                     </Link>
+                   </>
+                 ) : null}
+                 <DropdownMenuSeparator />
+                 <DropdownMenuItem asChild>
+                   <LogoutButton />
+                 </DropdownMenuItem>
+               </DropdownMenuContent>
+             </DropdownMenu>
+           ) : (
+             <div className="flex items-center gap-2">
+               <Link href="/login">
+                 <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+                   Sign In
+                 </Button>
+               </Link>
+               <Link href="/register">
+                 <Button size="sm" className="bg-white text-primary hover:bg-white/90 rounded-lg">
+                   Register
+                 </Button>
+               </Link>
+             </div>
+           )}
+         </div>
 
-        {/* Mobile Right Side */}
-        <div className="flex md:hidden items-center gap-2">
-          {session?.user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-9 w-9 rounded-full p-0 hover:bg-white/10"
-                >
-                  <Avatar className="h-9 w-9 ring-2 ring-white/50">
-                    <AvatarImage src={session.user.image || undefined} />
-                    <AvatarFallback className="bg-white/20 text-white text-sm font-medium">
-                      {session.user.name?.charAt(0).toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="flex items-center gap-2 p-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={session.user.image || undefined} />
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-                      {session.user.name?.charAt(0).toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <p className="text-sm font-medium leading-tight">{session.user.name}</p>
-                    <p className="text-xs text-muted-foreground leading-tight">
-                      {session.user.email}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <Link href={`/profile/${session.user.id}`}>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                </Link>
-                <Link href="/bookmarks">
-                  <DropdownMenuItem>Bookmarks</DropdownMenuItem>
-                </Link>
-                <Link href="/messages">
-                  <DropdownMenuItem>Messages</DropdownMenuItem>
-                </Link>
-                <Link href="/settings/profile">
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <LogoutButton />
-                </DropdownMenuItem>
+         {/* Mobile Right Side */}
+         <div className="flex md:hidden items-center gap-2">
+           {session?.user ? (
+             <DropdownMenu>
+               <DropdownMenuTrigger asChild>
+                 <Button
+                   variant="ghost"
+                   className="relative h-9 w-9 rounded-full p-0 hover:bg-white/10"
+                 >
+                   <Avatar className="h-9 w-9 ring-2 ring-white/50">
+                     <AvatarImage src={session.user.image || undefined} />
+                     <AvatarFallback className="bg-white/20 text-white text-sm font-medium">
+                       {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                     </AvatarFallback>
+                   </Avatar>
+                 </Button>
+               </DropdownMenuTrigger>
+               <DropdownMenuContent align="end" className="w-56">
+                 <div className="flex items-center gap-2 p-2">
+                   <Avatar className="h-8 w-8">
+                     <AvatarImage src={session.user.image || undefined} />
+                     <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                       {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                     </AvatarFallback>
+                   </Avatar>
+                   <div className="flex flex-col">
+                     <p className="text-sm font-medium leading-tight">{session.user.name}</p>
+                     <p className="text-xs text-muted-foreground leading-tight">
+                       {session.user.email}
+                     </p>
+                   </div>
+                 </div>
+                 <DropdownMenuSeparator />
+                 <Link href={`/profile/${session.user.id}`}>
+                   <DropdownMenuItem>Profile</DropdownMenuItem>
+                 </Link>
+                 <Link href="/bookmarks">
+                   <DropdownMenuItem>Bookmarks</DropdownMenuItem>
+                 </Link>
+                 <Link href="/messages">
+                   <DropdownMenuItem>Messages</DropdownMenuItem>
+                 </Link>
+                 <Link href="/settings/profile">
+                   <DropdownMenuItem>Settings</DropdownMenuItem>
+                 </Link>
+                 {(session.user as Record<string, unknown>).role === 'admin' || (session.user as Record<string, unknown>).role === 'moderator' ? (
+                   <>
+                     <DropdownMenuSeparator />
+                     <Link href="/admin">
+                       <DropdownMenuItem className="text-primary font-medium">
+                         <Shield className="h-4 w-4 mr-2" />
+                         Admin Dashboard
+                       </DropdownMenuItem>
+                     </Link>
+                   </>
+                 ) : null}
+                 <DropdownMenuSeparator />
+                 <DropdownMenuItem asChild>
+                   <LogoutButton />
+                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -252,22 +274,32 @@ export function Navbar() {
               <BookOpen className="h-4 w-4" /> Posts
             </Button>
           </Link>
-          <Link href="/anonymous" onClick={() => setMobileOpen(false)}>
-            <Button
-              variant={pathname.startsWith('/anonymous') ? 'secondary' : 'ghost'}
-              className="w-full justify-start gap-2"
-            >
-              <Shield className="h-4 w-4" /> Anonymous Q&A
-            </Button>
-          </Link>
-          <Link href="/search" onClick={() => setMobileOpen(false)}>
-            <Button
-              variant={pathname === '/search' ? 'secondary' : 'ghost'}
-              className="w-full justify-start gap-2"
-            >
-              <Search className="h-4 w-4" /> Search
-            </Button>
-          </Link>
+           <Link href="/anonymous" onClick={() => setMobileOpen(false)}>
+             <Button
+               variant={pathname.startsWith('/anonymous') ? 'secondary' : 'ghost'}
+               className="w-full justify-start gap-2"
+             >
+               <Shield className="h-4 w-4" /> Anonymous Q&A
+             </Button>
+           </Link>
+           {session?.user && ((session.user as Record<string, unknown>).role === 'admin' || (session.user as Record<string, unknown>).role === 'moderator') && (
+             <Link href="/admin" onClick={() => setMobileOpen(false)}>
+               <Button
+                 variant={pathname.startsWith('/admin') ? 'secondary' : 'ghost'}
+                 className="w-full justify-start gap-2"
+               >
+                 <Shield className="h-4 w-4" /> Admin
+               </Button>
+             </Link>
+           )}
+           <Link href="/search" onClick={() => setMobileOpen(false)}>
+             <Button
+               variant={pathname === '/search' ? 'secondary' : 'ghost'}
+               className="w-full justify-start gap-2"
+             >
+               <Search className="h-4 w-4" /> Search
+             </Button>
+           </Link>
           {!session?.user && (
             <div className="flex gap-2 pt-3 border-t border-border mt-3">
               <Link href="/login" className="flex-1" onClick={() => setMobileOpen(false)}>

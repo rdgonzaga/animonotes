@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { PenSquare } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { PenSquare, Pin } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { Sidebar } from '@/components/layout/sidebar';
 import { PostList } from '@/features/posts/components/post-list';
@@ -11,6 +12,7 @@ async function getPosts(categorySlug?: string) {
   try {
     const where = {
       deletedAt: null,
+      isPinned: false,
       ...(categorySlug && { category: { slug: categorySlug } }),
     };
     const [posts, total] = await Promise.all([
@@ -47,13 +49,52 @@ async function getPosts(categorySlug?: string) {
   }
 }
 
+async function getPinnedPosts(categorySlug?: string) {
+  try {
+    const where = {
+      isPinned: true,
+      deletedAt: null,
+      ...(categorySlug && { category: { slug: categorySlug } }),
+    };
+    const posts = await prisma.post.findMany({
+      where,
+      include: {
+        author: { select: { id: true, name: true, image: true } },
+        category: { select: { id: true, name: true, slug: true } },
+        _count: { select: { comments: true, votes: true } },
+      },
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const postIds = posts.map((post) => post.id);
+    const voteSums = postIds.length
+      ? await prisma.vote.groupBy({
+          by: ['postId'],
+          where: { postId: { in: postIds } },
+          _sum: { value: true },
+        })
+      : [];
+    const voteMap = new Map(voteSums.map((vote) => [vote.postId, vote._sum.value ?? 0]));
+    return posts.map((post) => ({
+      ...post,
+      score: voteMap.get(post.id) ?? 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function PostsPage({
   searchParams,
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
-  const { posts } = await getPosts(category);
+  const [{ posts }, pinnedPosts] = await Promise.all([
+    getPosts(category),
+    getPinnedPosts(category),
+  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,6 +122,30 @@ export default async function PostsPage({
                   </Button>
                 </Link>
               </div>
+
+              {/* Pinned posts section */}
+              {pinnedPosts.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Pin className="h-4 w-4 text-primary" />
+                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                      Pinned
+                    </h2>
+                  </div>
+                  <div className="space-y-4">
+                    {pinnedPosts.map((post) => (
+                      <div key={post.id} className="relative">
+                        <div className="absolute top-2 right-2 z-10">
+                          <Badge variant="secondary" className="text-xs gap-1">
+                            <Pin className="h-3 w-3" /> Pinned
+                          </Badge>
+                        </div>
+                        <PostList posts={[post]} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4">
                 <PostList

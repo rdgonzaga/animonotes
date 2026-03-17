@@ -278,6 +278,112 @@ async function main() {
   console.log(`✅ Created ${voteCount} votes`);
   console.log(`✅ Created ${bookmarkCount} bookmarks`);
 
+  // ==================== Admin Test Data ====================
+
+  // Set test user to admin role
+  await prisma.user.update({
+    where: { email: 'test@animonotes.app' },
+    data: { role: 'admin' },
+  });
+  console.log('✓ Set test user to admin role');
+
+  // Create moderator test user
+  const moderatorUser = await createSeedUser({
+    email: 'moderator@animonotes.app',
+    name: 'Test Moderator',
+    image: PROFILE_IMAGES[1],
+    role: 'moderator',
+  }).catch(async () => {
+    // User already exists — just update the role
+    return prisma.user.update({
+      where: { email: 'moderator@animonotes.app' },
+      data: { role: 'moderator' },
+    });
+  });
+  console.log('✓ Created moderator test user');
+
+  // Get the admin user for creating audit logs and reports
+  const adminUser = await prisma.user.findUnique({ where: { email: 'test@animonotes.app' } });
+  if (!adminUser) throw new Error('Admin user not found');
+
+  // Get some posts for reports
+  const reportPosts = await prisma.post.findMany({ take: 3, where: { deletedAt: null } });
+
+  // Create sample reports (if posts exist)
+  if (reportPosts.length > 0) {
+    for (let i = 0; i < Math.min(3, reportPosts.length); i++) {
+      await prisma.report.upsert({
+        where: { id: `seed-report-${i + 1}` },
+        update: {},
+        create: {
+          id: `seed-report-${i + 1}`,
+          reporterId: moderatorUser.id,
+          postId: reportPosts[i].id,
+          reason: `This post contains inappropriate content that violates community guidelines (seed report ${i + 1})`,
+          status: 'pending',
+        },
+      });
+    }
+    console.log('✓ Created sample reports');
+  }
+
+  // Create sample announcements
+  await prisma.announcement.upsert({
+    where: { id: 'seed-announcement-1' },
+    update: {},
+    create: {
+      id: 'seed-announcement-1',
+      title: 'Welcome to AnimoNotes!',
+      content: 'Share your notes and help fellow students succeed. Check out the latest posts!',
+      type: 'info',
+      isActive: true,
+      createdBy: adminUser.id,
+    },
+  });
+
+  await prisma.announcement.upsert({
+    where: { id: 'seed-announcement-2' },
+    update: {},
+    create: {
+      id: 'seed-announcement-2',
+      title: 'Exam Week Reminder',
+      content: 'Finals are coming up! Make sure to review your notes and collaborate with classmates.',
+      type: 'warning',
+      isActive: false,
+      createdBy: adminUser.id,
+    },
+  });
+  console.log('✓ Created sample announcements');
+
+  // Create sample audit log entries
+  const auditActions = [
+    { action: 'report.resolved', targetType: 'report', targetId: 'seed-report-1', details: { action: 'none', status: 'RESOLVED' } },
+    { action: 'category.create', targetType: 'category', targetId: 'seed-cat-1', details: { name: 'Test Category' } },
+    { action: 'announcement.create', targetType: 'announcement', targetId: 'seed-announcement-1', details: { title: 'Welcome to AnimoNotes!' } },
+  ];
+
+  for (const entry of auditActions) {
+    await prisma.auditLog.create({
+      data: {
+        actorId: adminUser.id,
+        action: entry.action,
+        targetType: entry.targetType,
+        targetId: entry.targetId,
+        details: entry.details,
+      },
+    });
+  }
+  console.log('✓ Created sample audit log entries');
+
+  // Pin one post
+  if (reportPosts.length > 0) {
+    await prisma.post.update({
+      where: { id: reportPosts[0].id },
+      data: { isPinned: true },
+    });
+    console.log('✓ Pinned a sample post');
+  }
+
   console.log('🎉 Seed completed successfully!');
 }
 
