@@ -35,6 +35,13 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // frontend domain validation check
+    if (!formData.email.toLowerCase().endsWith('@dlsu.edu.ph')) {
+      setError('Only @dlsu.edu.ph emails are allowed to register.');
+      return;
+    }
+
     setLoading(true);
 
     try {

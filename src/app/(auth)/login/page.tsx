@@ -14,12 +14,22 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get('registered');
+  const urlError = searchParams.get('error');
 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
+  
+  // initializes error state with URL error
+  const [error, setError] = useState(() => {
+    if (!urlError) return '';
+    if (urlError === 'FORBIDDEN' || urlError.includes('dlsu.edu.ph')) {
+      return 'Only @dlsu.edu.ph emails are allowed.';
+    }
+    // decode any other betterauth url errors for display
+    return decodeURIComponent(urlError); 
+  });
   const [loading, setLoading] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
 
