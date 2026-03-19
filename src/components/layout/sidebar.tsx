@@ -11,22 +11,24 @@ export function Sidebar() {
   const { data: session } = authClient.useSession();
   const [isMounted, setIsMounted] = useState(false);
   const role = (session?.user as Record<string, unknown> | undefined)?.role as string | undefined;
+  const profileHref = session?.user?.id ? `/profile/${session.user.id}` : '/login';
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   const links = [
-    { href: '/', label: 'HOME', icon: Home },
-    { href: '/settings/profile', label: 'PROFILE', icon: User },
-    { href: '/bookmarks', label: 'SAVED', icon: BookmarkIcon },
-    { href: '/faqs', label: 'FAQS', icon: HelpCircle },
+    { href: '/', label: 'HOME', icon: Home, activePrefix: '/' },
+    { href: profileHref, label: 'PROFILE', icon: User, activePrefix: '/profile' },
+    { href: '/bookmarks', label: 'SAVED', icon: BookmarkIcon, activePrefix: '/bookmarks' },
+    { href: '/faqs', label: 'FAQS', icon: HelpCircle, activePrefix: '/faqs' },
   ];
 
   return (
     <aside className="hidden lg:flex flex-col gap-1 w-44 xl:w-48 shrink-0 pt-2">
       {links.map((link) => {
-        const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+        const isActive =
+          link.activePrefix === '/' ? pathname === '/' : pathname.startsWith(link.activePrefix);
         return (
           <Link
             key={link.href}

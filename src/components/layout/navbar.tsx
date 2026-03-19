@@ -136,9 +136,6 @@ export function Navbar() {
                 <Link href="/messages">
                   <DropdownMenuItem>Messages</DropdownMenuItem>
                 </Link>
-                <Link href="/settings/profile">
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                </Link>
                 {canAccessAdmin ? (
                   <>
                     <DropdownMenuSeparator />
@@ -208,9 +205,6 @@ export function Navbar() {
                 </Link>
                 <Link href="/messages">
                   <DropdownMenuItem>Messages</DropdownMenuItem>
-                </Link>
-                <Link href="/settings/profile">
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
                 </Link>
                 {canAccessAdmin ? (
                   <>
