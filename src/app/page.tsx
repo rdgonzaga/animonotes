@@ -7,12 +7,20 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from '@/lib/session';
 import { HeroSlider } from '@/features/home/components/hero-slider';
 import { Sidebar } from '@/components/layout/sidebar';
-import { PostList } from '@/features/posts/components/post-list';
+import { InfinitePostFeed } from '@/features/posts/components/infinite-post-feed';
 
 export const dynamic = 'force-dynamic';
 
-async function getPosts() {
+const PAGE_SIZE = 10;
+
+async function getPosts(page = 1, limit = PAGE_SIZE) {
   try {
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safeLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : PAGE_SIZE;
+    const skip = (safePage - 1) * safeLimit;
+
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
         where: { deletedAt: null },
@@ -22,7 +30,8 @@ async function getPosts() {
           _count: { select: { comments: true, votes: true } },
         },
         orderBy: { createdAt: 'desc' },
-        take: 20,
+        skip,
+        take: safeLimit,
       }),
       prisma.post.count({ where: { deletedAt: null } }),
     ]);
@@ -41,9 +50,17 @@ async function getPosts() {
       score: voteMap.get(post.id) ?? 0,
     }));
 
-    return { posts: postsWithScores, pagination: { total } };
+    return {
+      posts: postsWithScores,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
+    };
   } catch {
-    return { posts: [], pagination: { total: 0 } };
+    return { posts: [], pagination: { page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 } };
   }
 }
 
@@ -100,8 +117,8 @@ async function getBookmarkedPosts() {
 }
 
 export default async function HomePage() {
-  const [{ posts }, categories, { bookmarks, isAuthenticated }] = await Promise.all([
-    getPosts(),
+  const [{ posts, pagination }, categories, { bookmarks, isAuthenticated }] = await Promise.all([
+    getPosts(1, PAGE_SIZE),
     getCategories(),
     getBookmarkedPosts(),
   ]);
@@ -130,9 +147,12 @@ export default async function HomePage() {
           {/* Main Feed */}
           <main className="flex-1 min-w-0">
             <div className="max-w-4xl mx-auto">
-              <div className="space-y-4">
-                <PostList posts={serializedPosts} />
-              </div>
+              <InfinitePostFeed
+                initialPosts={serializedPosts}
+                initialPage={pagination.page}
+                totalPages={pagination.totalPages}
+                limit={pagination.limit}
+              />
             </div>
           </main>
 

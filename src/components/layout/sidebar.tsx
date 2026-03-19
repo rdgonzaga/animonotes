@@ -2,13 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Home, User, Bookmark as BookmarkIcon, HelpCircle, Shield } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
+  const [isMounted, setIsMounted] = useState(false);
   const role = (session?.user as Record<string, unknown> | undefined)?.role as string | undefined;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const links = [
     { href: '/', label: 'HOME', icon: Home },
@@ -35,7 +41,7 @@ export function Sidebar() {
           </Link>
         );
       })}
-      {(role === 'admin' || role === 'moderator') && (
+      {isMounted && (role === 'admin' || role === 'moderator') && (
         <Link
           href="/admin"
           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors mt-2 border-t border-border pt-4 ${
