@@ -66,10 +66,10 @@ npm run dev
 
 Open http://localhost:3000
 
-### Seeded Login (for testing)
+### Auth Notes
 
-- Email: `test@animonotes.app`
-- Password: `password123`
+- Sign in uses Google OAuth only.
+- Only `@dlsu.edu.ph` Google accounts are allowed.
 
 ## Docker (App + DB)
 

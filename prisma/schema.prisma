@@ -18,11 +18,8 @@ model User {
   email             String    @unique
   name              String?
   image             String?
-  password          String?   // For credentials auth
-  securityQuestion  String?
-  securityAnswer    String?
   role              String    @default("user") // user, moderator, admin
-  emailVerified     DateTime?
+  emailVerified     Boolean   @default(false)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @default(now()) @updatedAt
   deletedAt         DateTime? // Soft delete
@@ -56,17 +53,16 @@ model Account {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
   userId            String
-  type              String
+  type              String   @default("oauth")
   provider          String
   providerAccountId String
   refresh_token     String?
   access_token      String?
-  expires_at        Int?
+  expires_at        DateTime?
   token_type        String?
   scope             String?
   id_token          String?
   session_state     String?
-  password          String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -88,6 +84,18 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  @@index([identifier])
+  @@index([expiresAt])
 }
 
 // ==================== Content Models ====================

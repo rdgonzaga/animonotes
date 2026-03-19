@@ -6,7 +6,6 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
 const baseURL = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-const hasGoogle = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
 export const auth = betterAuth({
   appName: 'Animo Notes',
@@ -15,20 +14,18 @@ export const auth = betterAuth({
   secret: process.env.AUTH_SECRET,
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   emailAndPassword: {
-    enabled: true,
-    password: {
-      hash: async (password) => bcrypt.hash(password, 10),
-      verify: async ({ hash, password }) => bcrypt.compare(password, hash),
+    enabled: false,
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      accessType: 'online',
+      hd: 'dlsu.edu.ph',
+      prompt: 'select_account',
+      allowedDomains: ['dlsu.edu.ph'],
     },
   },
-  socialProviders: hasGoogle
-    ? {
-        google: {
-          clientId: process.env.GOOGLE_CLIENT_ID as string,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        },
-      }
-    : {},
   user: {
     additionalFields: {
       role: {
@@ -36,17 +33,14 @@ export const auth = betterAuth({
         defaultValue: 'user',
         input: false,
       },
-      securityQuestion: {
-        type: 'string',
-        required: false,
-      },
-      securityAnswer: {
-        type: 'string',
-        required: false,
-      },
     },
   },
   account: {
+    accountLinking: {
+      enabled: true,
+      disableImplicitLinking: false,
+      trustedProviders: ['google'],
+    },
     fields: {
       providerId: 'provider',
       accountId: 'providerAccountId',
@@ -62,20 +56,8 @@ export const auth = betterAuth({
     fields: {
       token: 'sessionToken',
       expiresAt: 'expires',
-    },
-  },
-  databaseHooks: {
-    user: {
-      create: {
-        before: async (user) => {
-          const securityAnswer = (user as { securityAnswer?: string }).securityAnswer;
-          if (!securityAnswer) {
-            return { data: user };
-          }
-          const hashedAnswer = await bcrypt.hash(securityAnswer.toLowerCase(), 10);
-          return { data: { ...user, securityAnswer: hashedAnswer } };
-        },
-      },
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // 1 day
     },
   },
   plugins: [
