@@ -7,13 +7,20 @@ import { authClient } from '@/lib/auth-client';
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const urlError = searchParams.get('error');
+  const urlErrors = searchParams.getAll('error');
+  const urlError = urlErrors.length > 0 ? urlErrors[urlErrors.length - 1] : null;
 
   // initializes error state with URL error
   const error = (() => {
     if (!urlError) return '';
     if (urlError === 'FORBIDDEN' || urlError.includes('dlsu.edu.ph')) {
       return 'Only @dlsu.edu.ph emails are allowed.';
+    }
+    if (urlError === 'unable_to_link_account') {
+      return 'Sign in failed while linking your Google account. Please try again.';
+    }
+    if (urlError === 'unable_to_create_user') {
+      return 'Sign in failed while creating your account. Please try again.';
     }
     // decode any other Better Auth URL errors for display
     return decodeURIComponent(urlError);
@@ -24,7 +31,7 @@ export default function LoginPage() {
       provider: 'google',
       callbackURL: '/',
       newUserCallbackURL: '/',
-      errorCallbackURL: '/login?error=Only%20%40dlsu.edu.ph%20emails%20are%20allowed.',
+      errorCallbackURL: '/login',
     });
   };
 
