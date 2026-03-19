@@ -89,14 +89,25 @@ export async function GET(request: NextRequest) {
       const users = await prisma.user.findMany({
         where: {
           deletedAt: null,
-          name: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
+          OR: [
+            {
+              name: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
+            },
+            {
+              username: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
+            },
+          ],
         },
         select: {
           id: true,
           name: true,
+          username: true,
           image: true,
           createdAt: true,
           _count: {

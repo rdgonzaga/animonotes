@@ -40,7 +40,7 @@ const faqs = [
   {
     question: 'How do I delete my account?',
     answer:
-      'Go to Settings → Profile. Scroll down to the "Danger Zone" section and click "Delete Account." This action is irreversible — your posts and comments will be anonymized.',
+      'Account deletion is currently disabled because accounts are managed through Google OAuth. If you need help with account access, contact support.',
   },
 ];
 

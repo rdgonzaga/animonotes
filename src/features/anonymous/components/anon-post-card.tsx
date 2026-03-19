@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CategoryBadge } from '@/features/categories/components/category-badge';
-import { UserX } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { AnonPostCardProps } from '../types/anon-post';
+
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 export function AnonPostCard({ post }: AnonPostCardProps) {
   return (
@@ -17,9 +19,10 @@ export function AnonPostCard({ post }: AnonPostCardProps) {
             </Link>
             <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
-                  <UserX className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={ANON_PROFILE_IMAGE} />
+                  <AvatarFallback>A</AvatarFallback>
+                </Avatar>
                 <span className="font-medium text-orange-600">Anonymous</span>
               </div>
               <span>•</span>

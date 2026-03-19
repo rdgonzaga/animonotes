@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CategoryBadge } from '@/features/categories/components/category-badge';
+
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from '@/lib/session';
@@ -107,7 +109,9 @@ export default async function BookmarksPage() {
                           {bookmark.post.author ? (
                             <div className="flex items-center gap-2">
                               <Avatar className="h-6 w-6">
-                                <AvatarImage src={bookmark.post.author.image || undefined} />
+                                <AvatarImage
+                                  src={bookmark.post.author.image || ANON_PROFILE_IMAGE}
+                                />
                                 <AvatarFallback>
                                   {bookmark.post.author.name?.charAt(0).toUpperCase()}
                                 </AvatarFallback>
@@ -115,7 +119,13 @@ export default async function BookmarksPage() {
                               <span>{bookmark.post.author.name}</span>
                             </div>
                           ) : (
-                            <span>Anonymous</span>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={ANON_PROFILE_IMAGE} />
+                                <AvatarFallback>A</AvatarFallback>
+                              </Avatar>
+                              <span>Anonymous</span>
+                            </div>
                           )}
                           <span>•</span>
                           <span>{new Date(bookmark.post.createdAt).toLocaleDateString()}</span>

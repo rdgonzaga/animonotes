@@ -7,12 +7,22 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from '@/lib/session';
 import { HeroSlider } from '@/features/home/components/hero-slider';
 import { Sidebar } from '@/components/layout/sidebar';
-import { PostList } from '@/features/posts/components/post-list';
+import { InfinitePostFeed } from '@/features/posts/components/infinite-post-feed';
+import { SiteFooter } from '@/components/layout/site-footer';
 
 export const dynamic = 'force-dynamic';
 
-async function getPosts() {
+const PAGE_SIZE = 10;
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
+
+async function getPosts(page = 1, limit = PAGE_SIZE) {
   try {
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safeLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : PAGE_SIZE;
+    const skip = (safePage - 1) * safeLimit;
+
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
         where: { deletedAt: null },
@@ -22,7 +32,8 @@ async function getPosts() {
           _count: { select: { comments: true, votes: true } },
         },
         orderBy: { createdAt: 'desc' },
-        take: 20,
+        skip,
+        take: safeLimit,
       }),
       prisma.post.count({ where: { deletedAt: null } }),
     ]);
@@ -41,9 +52,17 @@ async function getPosts() {
       score: voteMap.get(post.id) ?? 0,
     }));
 
-    return { posts: postsWithScores, pagination: { total } };
+    return {
+      posts: postsWithScores,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
+    };
   } catch {
-    return { posts: [], pagination: { total: 0 } };
+    return { posts: [], pagination: { page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 } };
   }
 }
 
@@ -100,8 +119,8 @@ async function getBookmarkedPosts() {
 }
 
 export default async function HomePage() {
-  const [{ posts }, categories, { bookmarks, isAuthenticated }] = await Promise.all([
-    getPosts(),
+  const [{ posts, pagination }, categories, { bookmarks, isAuthenticated }] = await Promise.all([
+    getPosts(1, PAGE_SIZE),
     getCategories(),
     getBookmarkedPosts(),
   ]);
@@ -123,21 +142,31 @@ export default async function HomePage() {
 
       {/* Main Content: 3-column layout */}
       <div className="max-w-7xl mx-auto w-full px-4 py-6">
-        <div className="flex gap-6">
+        <div className="flex gap-6 items-start">
           {/* Left Sidebar — Desktop only */}
-          <Sidebar />
+          <div className="hidden lg:flex w-44 xl:w-48 shrink-0 flex-col sticky top-6 self-start max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pr-1">
+            <Sidebar />
+            <SiteFooter compact />
+          </div>
 
           {/* Main Feed */}
-          <main className="flex-1 min-w-0">
+          <main
+            id="home-feed-scroll"
+            className="flex-1 min-w-0 max-h-[calc(100vh-8rem)] overflow-y-auto pr-1 no-scrollbar"
+          >
             <div className="max-w-4xl mx-auto">
-              <div className="space-y-4">
-                <PostList posts={serializedPosts} />
-              </div>
+              <InfinitePostFeed
+                initialPosts={serializedPosts}
+                initialPage={pagination.page}
+                totalPages={pagination.totalPages}
+                limit={pagination.limit}
+                observerRootId="home-feed-scroll"
+              />
             </div>
           </main>
 
           {/* Right Sidebar — Desktop only */}
-          <aside className="hidden xl:flex flex-col gap-5 w-72 shrink-0">
+          <aside className="hidden xl:flex flex-col gap-5 w-72 shrink-0 sticky top-6 self-start max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pr-1">
             {/* Recently visited */}
             <Card>
               <CardHeader className="pb-2 flex-row items-center justify-between">
@@ -149,9 +178,9 @@ export default async function HomePage() {
                   <Link key={post.id} href={`/posts/${post.id}`} className="block group">
                     <div className="flex items-start gap-2">
                       <Avatar className="h-5 w-5 mt-0.5">
-                        <AvatarImage src={post.author?.image || undefined} />
+                        <AvatarImage src={post.author?.image || ANON_PROFILE_IMAGE} />
                         <AvatarFallback className="text-[10px] bg-muted">
-                          {post.author?.name?.charAt(0) || '?'}
+                          {post.author?.name?.charAt(0) || 'A'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
@@ -178,10 +207,10 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Recommended topics */}
+            {/* College categories */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">Recommended topics</CardTitle>
+                <CardTitle className="text-sm font-semibold">College Categories</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-2">
@@ -223,9 +252,9 @@ export default async function HomePage() {
                       >
                         <div className="flex items-start gap-2">
                           <Avatar className="h-5 w-5 mt-0.5">
-                            <AvatarImage src={bookmark.post.author?.image || undefined} />
+                            <AvatarImage src={bookmark.post.author?.image || ANON_PROFILE_IMAGE} />
                             <AvatarFallback className="text-[10px] bg-muted">
-                              {bookmark.post.author?.name?.charAt(0) || '?'}
+                              {bookmark.post.author?.name?.charAt(0) || 'A'}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">

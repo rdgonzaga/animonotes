@@ -23,6 +23,11 @@ export function Navbar() {
   const { data: session } = authClient.useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const sessionUser = session?.user as Record<string, unknown> | undefined;
+  const sessionUsername = typeof sessionUser?.username === 'string' ? sessionUser.username : null;
+  const profileHref = session?.user?.id
+    ? `/profile/${sessionUsername || session.user.id}`
+    : '/login';
   const role = (session?.user as Record<string, unknown> | undefined)?.role;
   const canAccessAdmin = role === 'admin' || role === 'moderator';
 
@@ -127,7 +132,7 @@ export function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <Link href={`/profile/${session.user.id}`}>
+                <Link href={profileHref}>
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
                 <Link href="/bookmarks">
@@ -135,9 +140,6 @@ export function Navbar() {
                 </Link>
                 <Link href="/messages">
                   <DropdownMenuItem>Messages</DropdownMenuItem>
-                </Link>
-                <Link href="/settings/profile">
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
                 </Link>
                 {canAccessAdmin ? (
                   <>
@@ -200,7 +202,7 @@ export function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <Link href={`/profile/${session.user.id}`}>
+                <Link href={profileHref}>
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
                 <Link href="/bookmarks">
@@ -208,9 +210,6 @@ export function Navbar() {
                 </Link>
                 <Link href="/messages">
                   <DropdownMenuItem>Messages</DropdownMenuItem>
-                </Link>
-                <Link href="/settings/profile">
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
                 </Link>
                 {canAccessAdmin ? (
                   <>

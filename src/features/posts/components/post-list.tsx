@@ -11,6 +11,8 @@ import { PostCardMenu } from '@/features/home/components/post-card-menu';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import type { PostListProps } from '../types/post-list';
 
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
+
 export function PostList({ posts, emptyMessage }: PostListProps) {
   const defaultEmpty = {
     title: 'No posts yet',
@@ -61,9 +63,9 @@ export function PostList({ posts, emptyMessage }: PostListProps) {
                 {/* Author row */}
                 <div className="flex items-center gap-2 mb-2 mt-3">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src={post.author?.image || undefined} />
+                    <AvatarImage src={post.author?.image || ANON_PROFILE_IMAGE} />
                     <AvatarFallback className="text- bg-muted text-muted-foreground">
-                      {post.author?.name?.charAt(0).toUpperCase() || '?'}
+                      {post.author?.name?.charAt(0).toUpperCase() || 'A'}
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-semibold">{post.author?.name || 'Anonymous'}</span>

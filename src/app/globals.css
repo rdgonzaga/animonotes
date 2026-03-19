@@ -214,3 +214,13 @@ select {
   font-family: var(--font-sans);
   font-size: 0.875rem;
 }
+
+/* Hide scrollbar while preserving scroll behavior */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

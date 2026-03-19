@@ -4,13 +4,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AnonPostCard } from '@/features/anonymous/components/anon-post-card';
 import { AnonDisclaimer } from '@/features/anonymous/components/anon-disclaimer';
 import { Sidebar } from '@/components/layout/sidebar';
-import { Shield, PenLine } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PenLine, Shield } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-async function getAnonymousPosts() {
+const PAGE_SIZE = 10;
+
+async function getAnonymousPosts(page = 1, limit = PAGE_SIZE) {
   try {
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safeLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : PAGE_SIZE;
+    const skip = (safePage - 1) * safeLimit;
+
     const where = { deletedAt: null, isAnonymous: true, authorId: null };
 
     const [posts, total] = await Promise.all([
@@ -21,7 +29,8 @@ async function getAnonymousPosts() {
           _count: { select: { comments: true, votes: true } },
         },
         orderBy: { createdAt: 'desc' },
-        take: 10,
+        skip,
+        take: safeLimit,
       }),
       prisma.post.count({ where }),
     ]);
@@ -39,15 +48,36 @@ async function getAnonymousPosts() {
 
     return {
       posts: postsWithScores,
-      pagination: { page: 1, limit: 10, total, totalPages: Math.ceil(total / 10) },
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
     };
   } catch {
-    return { posts: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } };
+    return { posts: [], pagination: { page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 } };
   }
 }
 
-export default async function AnonymousPage() {
-  const { posts, pagination } = await getAnonymousPosts();
+export default async function AnonymousPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const parsedPage = Number(pageParam || '1');
+  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1;
+  const { posts, pagination } = await getAnonymousPosts(currentPage, PAGE_SIZE);
+
+  const buildPageHref = (targetPage: number) => {
+    const params = new URLSearchParams();
+    if (targetPage > 1) {
+      params.set('page', String(targetPage));
+    }
+    const query = params.toString();
+    return query ? `/anonymous?${query}` : '/anonymous';
+  };
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 py-6">
@@ -96,8 +126,42 @@ export default async function AnonymousPage() {
           </div>
 
           {pagination.totalPages > 1 && (
-            <div className="mt-8 text-center text-sm text-muted-foreground">
-              Page {pagination.page} of {pagination.totalPages}
+            <div className="mt-8 flex items-center justify-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                disabled={pagination.page <= 1}
+                aria-disabled={pagination.page <= 1}
+              >
+                <Link
+                  href={buildPageHref(Math.max(1, pagination.page - 1))}
+                  tabIndex={pagination.page <= 1 ? -1 : undefined}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Link>
+              </Button>
+
+              <span className="text-sm text-muted-foreground px-3">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                disabled={pagination.page >= pagination.totalPages}
+                aria-disabled={pagination.page >= pagination.totalPages}
+              >
+                <Link
+                  href={buildPageHref(Math.min(pagination.totalPages, pagination.page + 1))}
+                  tabIndex={pagination.page >= pagination.totalPages ? -1 : undefined}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           )}
         </div>

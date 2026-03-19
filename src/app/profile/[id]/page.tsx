@@ -1,19 +1,28 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { prisma } from '@/lib/prisma';
 import { SendMessageButton } from '@/features/messages/components/send-message-button';
+import { getServerSession } from '@/lib/session';
+import { ProfileAcademicDetails } from '@/features/profile/components/profile-academic-details';
 
 export const dynamic = 'force-dynamic';
 
-async function getUser(id: string) {
+async function getUser(identifier: string) {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id },
+    const user = await prisma.user.findFirst({
+      where: {
+        deletedAt: null,
+        OR: [{ id: identifier }, { username: identifier }],
+      },
       select: {
         id: true,
         name: true,
         image: true,
+        username: true,
+        college: true,
+        course: true,
+        biography: true,
         createdAt: true,
         _count: {
           select: {
@@ -29,11 +38,11 @@ async function getUser(id: string) {
 
     // Calculate karma
     const userPosts = await prisma.post.findMany({
-      where: { authorId: id },
+      where: { authorId: user.id },
       select: { votes: { select: { value: true } } },
     });
     const userComments = await prisma.comment.findMany({
-      where: { authorId: id },
+      where: { authorId: user.id },
       select: { votes: { select: { value: true } } },
     });
     const karma = [
@@ -49,11 +58,17 @@ async function getUser(id: string) {
 
 export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getUser(id);
+  const [user, session] = await Promise.all([getUser(id), getServerSession()]);
 
   if (!user) {
     notFound();
   }
+
+  if (user.username && id !== user.username) {
+    redirect(`/profile/${user.username}`);
+  }
+
+  const canEdit = session?.user?.id === user.id;
 
   const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -73,8 +88,13 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
             </Avatar>
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
+              {user.username && (
+                <p className="text-sm text-muted-foreground mt-1">@{user.username}</p>
+              )}
               <p className="text-muted-foreground mb-3">Joined {joinDate}</p>
-              <SendMessageButton recipientId={user.id} recipientName={user.name || 'this user'} />
+              {!canEdit && (
+                <SendMessageButton recipientId={user.id} recipientName={user.name || 'this user'} />
+              )}
             </div>
           </div>
         </CardHeader>
@@ -97,6 +117,15 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
               <div className="text-sm text-muted-foreground">Votes Given</div>
             </div>
           </div>
+
+          <ProfileAcademicDetails
+            userId={user.id}
+            canEdit={canEdit}
+            initialCollege={user.college}
+            initialCourse={user.course}
+            initialUsername={user.username}
+            initialBiography={user.biography}
+          />
         </CardContent>
       </Card>
     </div>

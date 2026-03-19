@@ -18,6 +18,10 @@ model User {
   email             String    @unique
   name              String?
   image             String?
+  username          String?   @unique
+  college           String?
+  course            String?
+  biography         String?
   role              String    @default("user") // user, moderator, admin
   emailVerified     Boolean   @default(false)
   createdAt         DateTime  @default(now())

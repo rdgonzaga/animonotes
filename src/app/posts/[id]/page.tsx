@@ -14,6 +14,8 @@ import { getServerSession } from '@/lib/session';
 import { Sidebar } from '@/components/layout/sidebar';
 import { format } from 'date-fns';
 
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
+
 async function getPost(id: string) {
   try {
     const post = await prisma.post.findUnique({
@@ -24,6 +26,7 @@ async function getPost(id: string) {
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         category: {
@@ -128,12 +131,21 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
                                 {post.author.name?.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <Link href={`/profile/${post.author.id}`} className="hover:underline">
+                            <Link
+                              href={`/profile/${post.author.username || post.author.id}`}
+                              className="hover:underline"
+                            >
                               {post.author.name}
                             </Link>
                           </div>
                         ) : (
-                          <span>Anonymous</span>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={ANON_PROFILE_IMAGE} />
+                              <AvatarFallback>A</AvatarFallback>
+                            </Avatar>
+                            <span>Anonymous</span>
+                          </div>
                         )}
                         <span>•</span>
                         <span>{format(new Date(post.createdAt), 'MMM d, yyyy')}</span>

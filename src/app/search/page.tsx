@@ -10,6 +10,8 @@ import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search as SearchIcon, Calendar, Eye, MessageSquare } from 'lucide-react';
 
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
+
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -97,7 +99,13 @@ export default function SearchPage() {
                                 <span className="text-sm font-semibold">{post.author.name}</span>
                               </>
                             ) : (
-                              <span className="text-sm font-semibold">Anonymous</span>
+                              <>
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={ANON_PROFILE_IMAGE} />
+                                  <AvatarFallback className="text-xs bg-muted">A</AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-semibold">Anonymous</span>
+                              </>
                             )}
                           </div>
                           <Link href={`/posts/${post.id}`}>
@@ -138,7 +146,7 @@ export default function SearchPage() {
                 {results.users.map((user: any) => (
                   <Card key={user.id} className="group hover:shadow-md transition-all duration-200">
                     <CardContent className="pt-6">
-                      <Link href={`/profile/${user.id}`}>
+                      <Link href={`/profile/${user.username || user.id}`}>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-12 w-12">
                             <AvatarImage src={user.image || undefined} />
