@@ -50,3 +50,7 @@ tsconfig.tsbuildinfo
 # Docker environment)
 docker-compose.env
 
+# AI agent files
+AGENTS.md
+.sisyphus/
+

@@ -26,6 +26,9 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @default(now()) @updatedAt
   deletedAt         DateTime? // Soft delete
+  banned            Boolean   @default(false)
+  banReason         String?
+  banExpires        DateTime?
   
   // Relations
   accounts              Account[]
@@ -42,6 +45,8 @@ model User {
   reports               Report[]
   reportedDirectly      Report[]       @relation("ReportedUser")
   notifications         Notification[]
+  auditLogs             AuditLog[]
+  announcements         Announcement[]
 
   @@index([email])
 }
@@ -76,8 +81,9 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  ipAddress    String?
-  userAgent    String?
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -91,11 +97,13 @@ model Category {
   name        String   @unique
   slug        String   @unique
   description String?
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
   posts Post[]
 
   @@index([slug])
+  @@index([isActive])
 }
 
 model Tag {
@@ -120,6 +128,7 @@ model Post {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  isPinned    Boolean   @default(false)
 
   author   User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
   category Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -135,6 +144,7 @@ model Post {
   @@index([categoryId])
   @@index([createdAt])
   @@index([deletedAt])
+  @@index([isPinned])
 }
 
 model PostTag {
@@ -324,6 +334,44 @@ model Report {
   @@index([commentId])
   @@index([userId])
   @@index([status])
+}
+
+// ==================== Admin Models ====================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  actor User @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+model Announcement {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  type      String    @default("info")
+  isActive  Boolean   @default(true)
+  startsAt  DateTime  @default(now())
+  endsAt    DateTime?
+  createdBy String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([isActive])
+  @@index([startsAt])
+  @@index([endsAt])
 }
 
 // ==================== Notification Models ====================
