@@ -1,12 +1,63 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
+const runtimeUrl = process.env.DATABASE_URL;
+const fallbackDirectUrl = process.env.DIRECT_URL;
+const seedUrl = runtimeUrl || fallbackDirectUrl;
+
 const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DIRECT_URL || process.env.DATABASE_URL,
-    },
-  },
+  datasources: seedUrl
+    ? {
+        db: {
+          url: seedUrl,
+        },
+      }
+    : undefined,
 });
+
+function getConnectionIdentity(url: string) {
+  const parsed = new URL(url);
+  return {
+    host: parsed.hostname,
+    port: parsed.port || '5432',
+    database: parsed.pathname.replace(/^\//, ''),
+  };
+}
+
+function assertSeedTargetsRuntimeDatabase() {
+  if (!runtimeUrl) {
+    throw new Error('DATABASE_URL is missing. Production seed requires DATABASE_URL.');
+  }
+
+  if (!fallbackDirectUrl) {
+    return;
+  }
+
+  try {
+    const runtimeIdentity = getConnectionIdentity(runtimeUrl);
+    const directIdentity = getConnectionIdentity(fallbackDirectUrl);
+
+    const isSameDatabase =
+      runtimeIdentity.host === directIdentity.host &&
+      runtimeIdentity.port === directIdentity.port &&
+      runtimeIdentity.database === directIdentity.database;
+
+    if (!isSameDatabase) {
+      throw new Error(
+        [
+          'DATABASE_URL and DIRECT_URL point to different databases.',
+          `DATABASE_URL => ${runtimeIdentity.host}:${runtimeIdentity.port}/${runtimeIdentity.database}`,
+          `DIRECT_URL => ${directIdentity.host}:${directIdentity.port}/${directIdentity.database}`,
+          'Seed aborted to avoid writing data into a different database than the app runtime.',
+        ].join(' ')
+      );
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to validate DATABASE_URL and DIRECT_URL consistency.');
+  }
+}
 
 const CATEGORY_DATA = [
   {
@@ -433,6 +484,8 @@ async function seedAnnouncements(usersByEmail: Map<string, { id: string }>) {
 }
 
 async function main() {
+  assertSeedTargetsRuntimeDatabase();
+
   console.log('Starting production-safe seed...');
   console.log('No destructive operations will be executed.');
 
