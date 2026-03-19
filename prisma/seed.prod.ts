@@ -1,6 +1,12 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DIRECT_URL || process.env.DATABASE_URL,
+    },
+  },
+});
 
 const CATEGORY_DATA = [
   {
@@ -227,24 +233,64 @@ async function seedUsers() {
   const usersByEmail = new Map<string, { id: string }>();
 
   for (const user of SEEDED_USERS) {
-    const saved = await prisma.user.upsert({
-      where: { email: user.email },
-      update: {
-        name: user.name,
-        username: user.username,
-        image: user.image,
-        role: user.role,
-        emailVerified: true,
-      },
-      create: {
-        email: user.email,
-        name: user.name,
-        username: user.username,
-        image: user.image,
-        role: user.role,
-        emailVerified: true,
-      },
-    });
+    const existing = await prisma.user.findUnique({ where: { email: user.email } });
+
+    let saved;
+    try {
+      if (existing) {
+        saved = await prisma.user.update({
+          where: { id: existing.id },
+          data: {
+            name: user.name,
+            username: user.username,
+            image: user.image,
+            role: user.role,
+            emailVerified: true,
+          },
+        });
+      } else {
+        saved = await prisma.user.create({
+          data: {
+            email: user.email,
+            name: user.name,
+            username: user.username,
+            image: user.image,
+            role: user.role,
+            emailVerified: true,
+          },
+        });
+      }
+    } catch (error) {
+      const isUniqueError =
+        error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
+      if (!isUniqueError) throw error;
+
+      // If username is already taken by another account, proceed without forcing username.
+      if (existing) {
+        saved = await prisma.user.update({
+          where: { id: existing.id },
+          data: {
+            name: user.name,
+            image: user.image,
+            role: user.role,
+            emailVerified: true,
+          },
+        });
+      } else {
+        saved = await prisma.user.create({
+          data: {
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            role: user.role,
+            emailVerified: true,
+          },
+        });
+      }
+
+      console.warn(`Username conflict for ${user.email}; continued without forcing username.`);
+    }
+
     usersByEmail.set(user.email, { id: saved.id });
   }
 
@@ -390,9 +436,16 @@ async function main() {
   console.log('Starting production-safe seed...');
   console.log('No destructive operations will be executed.');
 
+  console.log('Seeding categories...');
   await seedCategories();
+
+  console.log('Seeding users...');
   const usersByEmail = await seedUsers();
+
+  console.log('Seeding posts, comments, votes, and bookmarks...');
   await seedPostsAndEngagement(usersByEmail);
+
+  console.log('Seeding announcements...');
   await seedAnnouncements(usersByEmail);
 
   console.log('Production-safe seed completed.');
