@@ -3,18 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import {
-  Menu,
-  X,
-  Search,
-  Bell,
-  PenSquare,
-  Home,
-  Bookmark,
-  User,
-  Shield,
-  BookOpen,
-} from 'lucide-react';
+import { Menu, X, Search, Bell, PenSquare, Home, User, Shield, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -157,13 +146,8 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/login">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/register">
                 <Button size="sm" className="bg-white text-primary hover:bg-white/90 rounded-lg">
-                  Register
+                  Sign In
                 </Button>
               </Link>
             </div>
@@ -271,12 +255,7 @@ export function Navbar() {
           {!session?.user && (
             <div className="flex gap-2 pt-3 border-t border-border mt-3">
               <Link href="/login" className="flex-1" onClick={() => setMobileOpen(false)}>
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/register" className="flex-1" onClick={() => setMobileOpen(false)}>
-                <Button className="w-full">Register</Button>
+                <Button className="w-full bg-white text-primary hover:bg-white/90">Sign In</Button>
               </Link>
             </div>
           )}
