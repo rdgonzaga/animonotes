@@ -7,7 +7,7 @@ import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { AnonCommentCardProps } from '../types/anon-comment';
 
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 export function AnonCommentCard({
   comment,

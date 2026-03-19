@@ -4,7 +4,7 @@ import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { AnonPostCardProps } from '../types/anon-post';
 
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 export function AnonPostCard({ post }: AnonPostCardProps) {
   return (

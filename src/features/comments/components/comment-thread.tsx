@@ -9,7 +9,7 @@ import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import type { CommentThreadProps } from '../types/comment';
 import { authClient } from '@/lib/auth-client';
 
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 export function CommentThread({
   comment,

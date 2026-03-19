@@ -14,7 +14,7 @@ import { getServerSession } from '@/lib/session';
 import { Sidebar } from '@/components/layout/sidebar';
 import { format } from 'date-fns';
 
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 async function getPost(id: string) {
   try {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CategoryBadge } from '@/features/categories/components/category-badge';
 
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from '@/lib/session';

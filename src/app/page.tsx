@@ -13,7 +13,7 @@ import { SiteFooter } from '@/components/layout/site-footer';
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 10;
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 async function getPosts(page = 1, limit = PAGE_SIZE) {
   try {

@@ -11,7 +11,7 @@ import { PostCardMenu } from '@/features/home/components/post-card-menu';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import type { PostListProps } from '../types/post-list';
 
-const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+const ANON_PROFILE_IMAGE = '/dummy_icons/profile_anon.webp';
 
 export function PostList({ posts, emptyMessage }: PostListProps) {
   const defaultEmpty = {
