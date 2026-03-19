@@ -1,8 +1,8 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const runtimeUrl = process.env.DATABASE_URL;
-const fallbackDirectUrl = process.env.DIRECT_URL;
-const seedUrl = runtimeUrl || fallbackDirectUrl;
+const directUrl = process.env.DIRECT_URL;
+const seedUrl = directUrl || runtimeUrl;
 
 const prisma = new PrismaClient({
   datasources: seedUrl
@@ -24,17 +24,17 @@ function getConnectionIdentity(url: string) {
 }
 
 function assertSeedTargetsRuntimeDatabase() {
-  if (!runtimeUrl) {
-    throw new Error('DATABASE_URL is missing. Production seed requires DATABASE_URL.');
+  if (!seedUrl) {
+    throw new Error('Missing database connection. Set DIRECT_URL or DATABASE_URL.');
   }
 
-  if (!fallbackDirectUrl) {
+  if (!runtimeUrl || !directUrl) {
     return;
   }
 
   try {
     const runtimeIdentity = getConnectionIdentity(runtimeUrl);
-    const directIdentity = getConnectionIdentity(fallbackDirectUrl);
+    const directIdentity = getConnectionIdentity(directUrl);
 
     const isSameDatabase =
       runtimeIdentity.host === directIdentity.host &&
@@ -58,10 +58,14 @@ function assertSeedTargetsRuntimeDatabase() {
           `DATABASE_URL => ${runtimeIdentity.host}:${runtimeIdentity.port}/${runtimeIdentity.database}`,
           `DIRECT_URL => ${directIdentity.host}:${directIdentity.port}/${directIdentity.database}`,
           'This is expected on providers like Supabase (pooler vs direct).',
-          'Seeding continues using DATABASE_URL to match app runtime.',
+          'Seeding continues using DIRECT_URL to avoid PgBouncer prepared statement issues.',
         ].join(' ')
       );
     }
+
+    console.log(
+      `Seed target confirmed: ${directIdentity.host}:${directIdentity.port}/${directIdentity.database}`
+    );
   } catch (error) {
     if (error instanceof Error) {
       throw error;
