@@ -19,7 +19,7 @@ export function SiteFooter({ compact = false }: SiteFooterProps) {
             Help
           </Link>
         </div>
-        <p>&copy; {new Date().getFullYear()} Animo Notes</p>
+        <p>&copy; {new Date().getFullYear()} AnimoNotes</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function SiteFooter({ compact = false }: SiteFooterProps) {
     <footer className="hidden md:block border-t border-border bg-background">
       <div className="max-w-7xl mx-auto w-full px-4 py-8">
         <div className="flex flex-col items-center gap-4">
-          <span className="font-serif text-xl font-bold text-primary">Animo Notes</span>
+          <span className="font-serif text-xl font-bold text-primary">AnimoNotes</span>
           <div className="flex items-center gap-6 text-sm">
             <Link
               href="/faqs"
@@ -50,7 +50,7 @@ export function SiteFooter({ compact = false }: SiteFooterProps) {
             </Link>
           </div>
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Animo Notes. All rights reserved.
+            &copy; {new Date().getFullYear()} AnimoNotes. All rights reserved.
           </p>
         </div>
       </div>

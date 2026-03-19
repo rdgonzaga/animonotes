@@ -7,8 +7,13 @@ import { AnnouncementBanner } from '@/features/admin/components/announcement-ban
 import { ConditionalFooter } from '@/components/layout/conditional-footer';
 
 export const metadata: Metadata = {
-  title: 'Animo Notes',
+  title: 'AnimoNotes',
   description: 'A modern forum for thoughtful discussion',
+  icons: {
+    icon: '/dummy_icons/animonotes_logo.webp',
+    shortcut: '/dummy_icons/animonotes_logo.webp',
+    apple: '/dummy_icons/animonotes_logo.webp',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

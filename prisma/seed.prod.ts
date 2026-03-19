@@ -45,6 +45,165 @@ const CATEGORY_DATA = [
   },
 ] as const;
 
+const PROFILE_IMAGES = [
+  '/dummy_icons/profile1.jpg',
+  '/dummy_icons/profile2.jpg',
+  '/dummy_icons/profile3.jpg',
+  '/dummy_icons/profile4.jpg',
+] as const;
+
+const POST_IMAGES = [
+  '/dummy_mainpic/comsci.jpg',
+  '/dummy_mainpic/engineering.jpeg',
+  '/dummy_mainpic/english1.jpg',
+  '/dummy_mainpic/math1.webp',
+  '/dummy_mainpic/psychology.jpg',
+  '/dummy_mainpic/science1.jpg',
+] as const;
+
+const SEEDED_USERS = [
+  {
+    email: 'rainer_gonzaga@dlsu.edu.ph',
+    name: 'Rainer Gonzaga',
+    username: 'rgonzaga',
+    image: PROFILE_IMAGES[0],
+    role: 'admin',
+  },
+  {
+    email: 'duncan_marcaida@dlsu.edu.ph',
+    name: 'Duncan Joseph Marcaida',
+    username: 'djmarcaida',
+    image: PROFILE_IMAGES[1],
+    role: 'moderator',
+  },
+  {
+    email: 'elkan_lamadrid@dlsu.edu.ph',
+    name: 'Elkan La Madrid',
+    username: 'elamadrid',
+    image: PROFILE_IMAGES[2],
+    role: 'user',
+  },
+  {
+    email: 'mariel_yasumuro@dlsu.edu.ph',
+    name: 'Mariel Yasumuro',
+    username: 'myasumuro',
+    image: PROFILE_IMAGES[3],
+    role: 'user',
+  },
+] as const;
+
+const SEEDED_POSTS = [
+  {
+    key: 'calc-limits',
+    title: 'Study tips for limits and continuity',
+    topic: 'limits and continuity',
+    categorySlug: 'ccs',
+    authorEmail: 'rainer_gonzaga@dlsu.edu.ph',
+    image: POST_IMAGES[3],
+  },
+  {
+    key: 'calc-derivatives',
+    title: 'Common mistakes in derivatives',
+    topic: 'derivatives',
+    categorySlug: 'gcoe',
+    authorEmail: 'duncan_marcaida@dlsu.edu.ph',
+    image: POST_IMAGES[1],
+  },
+  {
+    key: 'bio-cells',
+    title: 'Quick notes on cell structure',
+    topic: 'cell structure',
+    categorySlug: 'cos',
+    authorEmail: 'elkan_lamadrid@dlsu.edu.ph',
+    image: POST_IMAGES[5],
+  },
+  {
+    key: 'chem-bonding',
+    title: 'Best resources to learn chemical bonding',
+    topic: 'chemical bonding',
+    categorySlug: 'cos',
+    authorEmail: 'mariel_yasumuro@dlsu.edu.ph',
+    image: POST_IMAGES[5],
+  },
+  {
+    key: 'history-ww2',
+    title: 'Summary: World War II in 10 points',
+    topic: 'World War II',
+    categorySlug: 'cla',
+    authorEmail: 'rainer_gonzaga@dlsu.edu.ph',
+    image: POST_IMAGES[2],
+  },
+  {
+    key: 'art-renaissance',
+    title: 'What surprised you about Renaissance art?',
+    topic: 'Renaissance art',
+    categorySlug: 'cla',
+    authorEmail: 'duncan_marcaida@dlsu.edu.ph',
+    image: POST_IMAGES[2],
+  },
+  {
+    key: 'lit-poetry',
+    title: 'Help me understand poetic devices',
+    topic: 'poetic devices',
+    categorySlug: 'cla',
+    authorEmail: 'elkan_lamadrid@dlsu.edu.ph',
+    image: null,
+  },
+  {
+    key: 'lit-shakespeare',
+    title: 'Question about Shakespearean themes',
+    topic: 'Shakespearean themes',
+    categorySlug: 'cla',
+    authorEmail: 'mariel_yasumuro@dlsu.edu.ph',
+    image: null,
+  },
+  {
+    key: 'lang-french',
+    title: 'How I review basic French grammar',
+    topic: 'basic French grammar',
+    categorySlug: 'bagced',
+    authorEmail: 'rainer_gonzaga@dlsu.edu.ph',
+    image: POST_IMAGES[0],
+  },
+  {
+    key: 'lang-japanese',
+    title: 'Share your notes on Japanese particles',
+    topic: 'Japanese particles',
+    categorySlug: 'bagced',
+    authorEmail: 'duncan_marcaida@dlsu.edu.ph',
+    image: POST_IMAGES[0],
+  },
+  {
+    key: 'skills-time',
+    title: 'Time management for exam week',
+    topic: 'time management',
+    categorySlug: 'rvrcob',
+    authorEmail: 'elkan_lamadrid@dlsu.edu.ph',
+    image: POST_IMAGES[4],
+  },
+  {
+    key: 'skills-notes',
+    title: 'Note-taking systems that actually work',
+    topic: 'note-taking systems',
+    categorySlug: 'soe',
+    authorEmail: 'mariel_yasumuro@dlsu.edu.ph',
+    image: POST_IMAGES[4],
+  },
+] as const;
+
+function buildContent(topic: string, categoryName: string) {
+  return [
+    `<p>Here are my notes on ${topic} for ${categoryName}. I tried to keep this concise and practical.</p>`,
+    '<ul>',
+    '<li>Main idea and definition in one sentence.</li>',
+    '<li>Key steps or rules to remember.</li>',
+    '<li>One quick example or application.</li>',
+    '<li>Common pitfalls and how to avoid them.</li>',
+    '</ul>',
+    '<p>If you have a better explanation or a shortcut, please share it!</p>',
+  ].join('');
+}
+
 async function seedCategories() {
   for (const category of CATEGORY_DATA) {
     await prisma.category.upsert({
@@ -64,31 +223,167 @@ async function seedCategories() {
   }
 }
 
-async function ensurePrivilegedUsers() {
-  const adminEmail = 'rainer_gonzaga@dlsu.edu.ph';
-  const moderatorEmail = 'duncan_marcaida@dlsu.edu.ph';
+async function seedUsers() {
+  const usersByEmail = new Map<string, { id: string }>();
 
-  const admin = await prisma.user.findUnique({ where: { email: adminEmail } });
-  if (admin) {
-    await prisma.user.update({
-      where: { id: admin.id },
-      data: {
-        role: 'admin',
+  for (const user of SEEDED_USERS) {
+    const saved = await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.name,
+        username: user.username,
+        image: user.image,
+        role: user.role,
+        emailVerified: true,
+      },
+      create: {
+        email: user.email,
+        name: user.name,
+        username: user.username,
+        image: user.image,
+        role: user.role,
         emailVerified: true,
       },
     });
+    usersByEmail.set(user.email, { id: saved.id });
   }
 
-  const moderator = await prisma.user.findUnique({ where: { email: moderatorEmail } });
-  if (moderator) {
-    await prisma.user.update({
-      where: { id: moderator.id },
-      data: {
-        role: 'moderator',
-        emailVerified: true,
+  return usersByEmail;
+}
+
+async function seedPostsAndEngagement(usersByEmail: Map<string, { id: string }>) {
+  const categories = await prisma.category.findMany({
+    where: { slug: { in: CATEGORY_DATA.map((c) => c.slug) } },
+  });
+  const categoriesBySlug = new Map(categories.map((c) => [c.slug, c]));
+
+  const postsByKey = new Map<string, { id: string }>();
+
+  for (const post of SEEDED_POSTS) {
+    const category = categoriesBySlug.get(post.categorySlug);
+    const author = usersByEmail.get(post.authorEmail);
+
+    if (!category || !author) continue;
+
+    const created = await prisma.post.upsert({
+      where: { id: `seed-prod-post-${post.key}` },
+      update: {
+        title: post.title,
+        content: buildContent(post.topic, category.name),
+        image: post.image,
+        authorId: author.id,
+        categoryId: category.id,
+        isAnonymous: false,
+        deletedAt: null,
+      },
+      create: {
+        id: `seed-prod-post-${post.key}`,
+        title: post.title,
+        content: buildContent(post.topic, category.name),
+        image: post.image,
+        authorId: author.id,
+        categoryId: category.id,
+        isAnonymous: false,
       },
     });
+
+    postsByKey.set(post.key, { id: created.id });
   }
+
+  for (const post of SEEDED_POSTS) {
+    const savedPost = postsByKey.get(post.key);
+    if (!savedPost) continue;
+
+    const commenterEmails = [
+      'rainer_gonzaga@dlsu.edu.ph',
+      'duncan_marcaida@dlsu.edu.ph',
+      'elkan_lamadrid@dlsu.edu.ph',
+      'mariel_yasumuro@dlsu.edu.ph',
+    ];
+
+    for (let i = 0; i < 2; i += 1) {
+      const commenter = usersByEmail.get(
+        commenterEmails[(i + post.key.length) % commenterEmails.length]
+      );
+      if (!commenter) continue;
+
+      await prisma.comment.upsert({
+        where: { id: `seed-prod-comment-${post.key}-${i + 1}` },
+        update: {
+          content: `I like this topic. Here is my quick take #${i + 1}.`,
+          authorId: commenter.id,
+          postId: savedPost.id,
+          isAnonymous: false,
+          deletedAt: null,
+        },
+        create: {
+          id: `seed-prod-comment-${post.key}-${i + 1}`,
+          content: `I like this topic. Here is my quick take #${i + 1}.`,
+          authorId: commenter.id,
+          postId: savedPost.id,
+          isAnonymous: false,
+        },
+      });
+    }
+
+    for (const [email, user] of usersByEmail.entries()) {
+      const voteValue = email === post.authorEmail ? 1 : 1;
+      await prisma.vote.upsert({
+        where: {
+          userId_postId: {
+            userId: user.id,
+            postId: savedPost.id,
+          },
+        },
+        update: { value: voteValue },
+        create: {
+          userId: user.id,
+          postId: savedPost.id,
+          value: voteValue,
+        },
+      });
+    }
+
+    for (const user of usersByEmail.values()) {
+      await prisma.bookmark.upsert({
+        where: {
+          userId_postId: {
+            userId: user.id,
+            postId: savedPost.id,
+          },
+        },
+        update: {},
+        create: {
+          userId: user.id,
+          postId: savedPost.id,
+        },
+      });
+    }
+  }
+}
+
+async function seedAnnouncements(usersByEmail: Map<string, { id: string }>) {
+  const admin = usersByEmail.get('rainer_gonzaga@dlsu.edu.ph');
+  if (!admin) return;
+
+  await prisma.announcement.upsert({
+    where: { id: 'seed-prod-announcement-1' },
+    update: {
+      title: 'Welcome to AnimoNotes!',
+      content: 'Share your notes and help fellow students succeed. Check out the latest posts!',
+      type: 'info',
+      isActive: true,
+      createdBy: admin.id,
+    },
+    create: {
+      id: 'seed-prod-announcement-1',
+      title: 'Welcome to AnimoNotes!',
+      content: 'Share your notes and help fellow students succeed. Check out the latest posts!',
+      type: 'info',
+      isActive: true,
+      createdBy: admin.id,
+    },
+  });
 }
 
 async function main() {
@@ -96,7 +391,9 @@ async function main() {
   console.log('No destructive operations will be executed.');
 
   await seedCategories();
-  await ensurePrivilegedUsers();
+  const usersByEmail = await seedUsers();
+  await seedPostsAndEngagement(usersByEmail);
+  await seedAnnouncements(usersByEmail);
 
   console.log('Production-safe seed completed.');
 }

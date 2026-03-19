@@ -3,9 +3,9 @@ import { Sidebar } from '@/components/layout/sidebar';
 
 const faqs = [
   {
-    question: 'What is Animo Notes?',
+    question: 'What is AnimoNotes?',
     answer:
-      'Animo Notes is a modern note-sharing platform designed for students and learners. Share knowledge, ask questions, and grow together across academic subjects like Math, Science, History, Literature, Languages, and more.',
+      'AnimoNotes is a modern note-sharing platform designed for students and learners. Share knowledge, ask questions, and grow together across academic subjects like Math, Science, History, Literature, Languages, and more.',
   },
   {
     question: 'How do I create a post?',
@@ -54,7 +54,7 @@ export default function FAQsPage() {
             <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">
               Frequently Asked Questions
             </h1>
-            <p className="text-muted-foreground">Everything you need to know about Animo Notes</p>
+            <p className="text-muted-foreground">Everything you need to know about AnimoNotes</p>
             <span className="accent-line" />
           </div>
 

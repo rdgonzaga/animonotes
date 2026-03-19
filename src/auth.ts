@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 const baseURL = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
 
 export const auth = betterAuth({
-  appName: 'Animo Notes',
+  appName: 'AnimoNotes',
   baseURL,
   trustedOrigins: [baseURL],
   secret: process.env.AUTH_SECRET,

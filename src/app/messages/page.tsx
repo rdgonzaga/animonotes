@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare } from 'lucide-react';
 
 export const metadata = {
-  title: 'Messages - Animo Notes',
+  title: 'Messages - AnimoNotes',
   description: 'Your direct messages',
 };
 
