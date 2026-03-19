@@ -113,7 +113,7 @@ export function FeedSection({ posts, categories }: FeedSectionProps) {
         <Card className="border-dashed">
           <CardContent className="py-16 text-center">
             <MessageSquare className="h-12 w-12 text-primary/40 mx-auto mb-4" />
-            <p className="text-xl font-serif font-bold mb-2">
+            <p className="text-xl font-sans font-bold mb-2">
               {activeTab === 'by-category' && selectedCategory
                 ? 'No posts in this category'
                 : 'No posts yet'}

@@ -49,7 +49,7 @@ export default function SearchPage() {
   return (
     <div className="max-w-4xl mx-auto w-full py-8 px-4">
       <div className="mb-8">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">Search</h1>
+        <h1 className="font-sans text-3xl sm:text-4xl font-bold mb-2">Search</h1>
         <span className="accent-line" />
       </div>
 
@@ -80,7 +80,7 @@ export default function SearchPage() {
         <div className="space-y-10">
           {results.posts && results.posts.length > 0 && (
             <div>
-              <h2 className="font-serif text-2xl font-bold mb-4">Posts ({results.posts.length})</h2>
+              <h2 className="font-sans text-2xl font-bold mb-4">Posts ({results.posts.length})</h2>
               <div className="space-y-4">
                 {results.posts.map((post: any) => (
                   <Card key={post.id} className="group hover:shadow-md transition-all duration-200">
@@ -141,7 +141,7 @@ export default function SearchPage() {
 
           {results.users && results.users.length > 0 && (
             <div>
-              <h2 className="font-serif text-2xl font-bold mb-4">Users ({results.users.length})</h2>
+              <h2 className="font-sans text-2xl font-bold mb-4">Users ({results.users.length})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {results.users.map((user: any) => (
                   <Card key={user.id} className="group hover:shadow-md transition-all duration-200">
@@ -175,7 +175,7 @@ export default function SearchPage() {
             <Card className="border-dashed">
               <CardContent className="py-12 text-center">
                 <SearchIcon className="h-12 w-12 text-primary/40 mx-auto mb-4" />
-                <p className="text-lg font-serif font-bold mb-1">No results found</p>
+                <p className="text-lg font-sans font-bold mb-1">No results found</p>
                 <p className="text-muted-foreground">Try a different search term</p>
               </CardContent>
             </Card>
@@ -187,7 +187,7 @@ export default function SearchPage() {
         <Card className="border-dashed">
           <CardContent className="py-16 text-center">
             <SearchIcon className="h-12 w-12 text-primary/40 mx-auto mb-4" />
-            <p className="text-lg font-serif font-bold mb-1">Find what you&apos;re looking for</p>
+            <p className="text-lg font-sans font-bold mb-1">Find what you&apos;re looking for</p>
             <p className="text-muted-foreground">Enter a search query to find posts and users</p>
           </CardContent>
         </Card>

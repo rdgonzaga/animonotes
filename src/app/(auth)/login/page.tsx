@@ -48,7 +48,7 @@ export default function LoginPage() {
       {/* Green gradient hero section */}
       <section className="relative gradient-hero py-16 md:py-24 overflow-hidden">
         <div className="relative max-w-4xl mx-auto px-4 text-center">
-          <h1 className="font-serif text-3xl md:text-5xl font-bold text-white mb-8 leading-tight">
+          <h1 className="font-sans text-3xl md:text-5xl font-bold text-white mb-8 leading-tight">
             Elevating the study experience
           </h1>
 
@@ -62,7 +62,7 @@ export default function LoginPage() {
             <p className="text-white/90 font-medium mb-6">Share knowledge, grow together</p>
 
             <Button
-              className="w-full bg-white text-foreground hover:bg-white/90 rounded-lg gap-2 mb-3"
+              className="w-full bg-white text-black hover:bg-white/90 dark:text-black dark:hover:bg-white/90 rounded-lg gap-2 mb-3"
               onClick={handleGoogleSignIn}
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@ export default function LoginPage() {
       {/* Features section */}
       <section className="bg-background py-16 md:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="font-serif text-2xl md:text-4xl text-primary mb-12">
+          <h2 className="font-sans text-2xl md:text-4xl text-primary mb-12">
             Stop scrambling and start{' '}
             <span className="underline decoration-primary/30 decoration-2 underline-offset-4">
               sharing

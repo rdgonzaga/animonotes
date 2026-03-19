@@ -28,7 +28,7 @@ export function SiteFooter({ compact = false }: SiteFooterProps) {
     <footer className="hidden md:block border-t border-border bg-background">
       <div className="max-w-7xl mx-auto w-full px-4 py-8">
         <div className="flex flex-col items-center gap-4">
-          <span className="font-serif text-xl font-bold text-primary">AnimoNotes</span>
+          <span className="font-sans text-xl font-bold text-primary">AnimoNotes</span>
           <div className="flex items-center gap-6 text-sm">
             <Link
               href="/faqs"

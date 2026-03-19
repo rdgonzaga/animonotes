@@ -88,7 +88,7 @@ export default async function AnonymousPage({
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                <h1 className="font-serif text-3xl sm:text-4xl font-bold">Anonymous Q&amp;A</h1>
+                <h1 className="font-sans text-3xl sm:text-4xl font-bold">Anonymous Q&amp;A</h1>
               </div>
               <span className="accent-line mt-2" />
               <p className="text-muted-foreground mt-3">
@@ -110,7 +110,7 @@ export default async function AnonymousPage({
               <Card className="border-dashed">
                 <CardContent className="py-16 text-center">
                   <Shield className="h-12 w-12 text-primary/40 mx-auto mb-4" />
-                  <p className="text-xl font-serif font-bold mb-2">No anonymous posts yet</p>
+                  <p className="text-xl font-sans font-bold mb-2">No anonymous posts yet</p>
                   <p className="text-muted-foreground mb-6">Be the first to ask a question!</p>
                   <Link href="/anonymous/new">
                     <Button className="gap-2">

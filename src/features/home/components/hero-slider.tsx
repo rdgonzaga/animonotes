@@ -30,7 +30,7 @@ export function HeroSlider({ featuredPosts }: HeroSliderProps) {
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative max-w-7xl mx-auto w-full h-full flex items-end px-4 pb-6">
           <div className="text-white">
-            <h2 className="font-serif text-2xl md:text-4xl font-bold">Welcome to AnimoNotes</h2>
+            <h2 className="font-sans text-2xl md:text-4xl font-bold">Welcome to AnimoNotes</h2>
             <p className="text-sm opacity-80 mt-2">A space for thoughtful discussion and sharing</p>
           </div>
         </div>

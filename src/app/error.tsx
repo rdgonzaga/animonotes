@@ -22,7 +22,7 @@ export default function Error({
         <CardContent className="pt-12 pb-10 space-y-6">
           <AlertCircle className="h-16 w-16 text-destructive mx-auto" />
           <div className="space-y-2">
-            <h1 className="font-serif text-2xl font-bold">Something went wrong</h1>
+            <h1 className="font-sans text-2xl font-bold">Something went wrong</h1>
             <p className="text-muted-foreground">
               An error occurred while processing your request.
             </p>

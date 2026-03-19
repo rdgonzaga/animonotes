@@ -163,7 +163,7 @@ export function UserManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-serif font-bold text-primary">User Management</h1>
+        <h1 className="text-2xl font-sans font-bold text-primary">User Management</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage user accounts, roles, and access</p>
       </div>
 

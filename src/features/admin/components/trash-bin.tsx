@@ -118,7 +118,7 @@ export function TrashBin() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-serif font-bold text-primary">Trash Bin</h1>
+        <h1 className="text-2xl font-sans font-bold text-primary">Trash Bin</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Soft-deleted content. Items older than 30 days can be permanently deleted.
         </p>

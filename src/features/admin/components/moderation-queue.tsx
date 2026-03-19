@@ -104,7 +104,7 @@ export function ModerationQueue() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-primary">Moderation Queue</h1>
+          <h1 className="text-2xl font-sans font-bold text-primary">Moderation Queue</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Review and act on flagged content and user reports
           </p>

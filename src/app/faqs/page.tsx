@@ -51,7 +51,7 @@ export default function FAQsPage() {
         <Sidebar />
         <div className="flex-1 min-w-0">
           <div className="mb-8">
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">
+            <h1 className="font-sans text-3xl sm:text-4xl font-bold mb-2">
               Frequently Asked Questions
             </h1>
             <p className="text-muted-foreground">Everything you need to know about AnimoNotes</p>
