@@ -2,16 +2,15 @@ import { z } from 'zod';
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/require-permission';
 import { logAdminAction } from '@/features/admin/lib/audit';
-import { auth } from '@/features/auth/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+const SINGLE_ADMIN_EMAIL = 'rainer_gonzaga@dlsu.edu.ph';
 
 const roleBodySchema = z.object({
   role: z.enum(['user', 'moderator', 'admin']),
 });
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const { error, session } = await requireAdmin(request);
@@ -20,7 +19,10 @@ export async function PATCH(
     const body = await request.json();
     const validation = roleBodySchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json({ error: 'Validation failed', details: validation.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Validation failed', details: validation.error.issues },
+        { status: 400 }
+      );
     }
 
     // Prevent self-role-removal
@@ -28,9 +30,38 @@ export async function PATCH(
       return NextResponse.json({ error: 'Cannot remove your own admin role' }, { status: 400 });
     }
 
-    const result = await auth.api.setRole({
-      body: { userId: id, role: validation.data.role as 'user' | 'admin' },
-      headers: request.headers,
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, email: true, role: true },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    if (targetUser.email === SINGLE_ADMIN_EMAIL && validation.data.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Cannot remove admin privileges from the designated admin account' },
+        { status: 400 }
+      );
+    }
+
+    if (validation.data.role === 'admin' && targetUser.email !== SINGLE_ADMIN_EMAIL) {
+      return NextResponse.json(
+        { error: `Only ${SINGLE_ADMIN_EMAIL} can have admin privileges` },
+        { status: 400 }
+      );
+    }
+
+    const result = await prisma.user.update({
+      where: { id },
+      data: { role: validation.data.role },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
     });
 
     await logAdminAction({

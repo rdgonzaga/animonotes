@@ -277,31 +277,18 @@ async function main() {
 
   // ==================== Admin Test Data ====================
 
-  // Set test user to admin role
-  await prisma.user.update({
-    where: { email: 'test@animonotes.app' },
-    data: { role: 'admin' },
+  // Keep exactly one admin account in seed data.
+  const adminUser = await prisma.user.findUnique({
+    where: { email: 'rainer_gonzaga@dlsu.edu.ph' },
   });
-  console.log('✓ Set test user to admin role');
-
-  // Create moderator test user
-  const moderatorUser = await createSeedUser({
-    email: 'moderator@animonotes.app',
-    name: 'Test Moderator',
-    image: PROFILE_IMAGES[1],
-    role: 'moderator',
-  }).catch(async () => {
-    // User already exists — just update the role
-    return prisma.user.update({
-      where: { email: 'moderator@animonotes.app' },
-      data: { role: 'moderator' },
-    });
-  });
-  console.log('✓ Created moderator test user');
-
-  // Get the admin user for creating audit logs and reports
-  const adminUser = await prisma.user.findUnique({ where: { email: 'test@animonotes.app' } });
   if (!adminUser) throw new Error('Admin user not found');
+
+  // Create or update a moderator user from existing DLSU-seeded users.
+  const moderatorUser = await prisma.user.update({
+    where: { email: 'duncan.marcaida@dlsu.edu.ph' },
+    data: { role: 'moderator' },
+  });
+  console.log('✓ Set duncan.marcaida@dlsu.edu.ph as moderator');
 
   // Get some posts for reports
   const reportPosts = await prisma.post.findMany({ take: 3, where: { deletedAt: null } });
@@ -344,7 +331,8 @@ async function main() {
     create: {
       id: 'seed-announcement-2',
       title: 'Exam Week Reminder',
-      content: 'Finals are coming up! Make sure to review your notes and collaborate with classmates.',
+      content:
+        'Finals are coming up! Make sure to review your notes and collaborate with classmates.',
       type: 'warning',
       isActive: false,
       createdBy: adminUser.id,
@@ -354,9 +342,24 @@ async function main() {
 
   // Create sample audit log entries
   const auditActions = [
-    { action: 'report.resolved', targetType: 'report', targetId: 'seed-report-1', details: { action: 'none', status: 'RESOLVED' } },
-    { action: 'category.create', targetType: 'category', targetId: 'seed-cat-1', details: { name: 'Test Category' } },
-    { action: 'announcement.create', targetType: 'announcement', targetId: 'seed-announcement-1', details: { title: 'Welcome to AnimoNotes!' } },
+    {
+      action: 'report.resolved',
+      targetType: 'report',
+      targetId: 'seed-report-1',
+      details: { action: 'none', status: 'RESOLVED' },
+    },
+    {
+      action: 'category.create',
+      targetType: 'category',
+      targetId: 'seed-cat-1',
+      details: { name: 'Test Category' },
+    },
+    {
+      action: 'announcement.create',
+      targetType: 'announcement',
+      targetId: 'seed-announcement-1',
+      details: { title: 'Welcome to AnimoNotes!' },
+    },
   ];
 
   for (const entry of auditActions) {
