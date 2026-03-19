@@ -2,10 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, User, Bookmark as BookmarkIcon, HelpCircle } from 'lucide-react';
+import { Home, User, Bookmark as BookmarkIcon, HelpCircle, Shield } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+  const role = (session?.user as Record<string, unknown> | undefined)?.role as string | undefined;
 
   const links = [
     { href: '/', label: 'HOME', icon: Home },
@@ -32,6 +35,18 @@ export function Sidebar() {
           </Link>
         );
       })}
+      {(role === 'admin' || role === 'moderator') && (
+        <Link
+          href="/admin"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors mt-2 border-t border-border pt-4 ${
+            pathname.startsWith('/admin')
+              ? 'text-primary font-medium bg-primary/5'
+              : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+          }`}
+        >
+          <Shield className="h-4 w-4" /> ADMIN
+        </Link>
+      )}
     </aside>
   );
 }

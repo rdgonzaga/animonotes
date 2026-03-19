@@ -23,7 +23,8 @@
       "@/*": ["./src/*"]
     },
     "allowJs": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "types": ["vitest/globals"]
   },
   "include": [
     "next-env.d.ts",

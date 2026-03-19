@@ -1,6 +1,8 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
+import { admin } from 'better-auth/plugins';
+import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
 const baseURL = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
@@ -58,5 +60,11 @@ export const auth = betterAuth({
       updateAge: 60 * 60 * 24, // 1 day
     },
   },
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: 'user',
+      adminRoles: ['admin'],
+    }),
+  ],
 });
