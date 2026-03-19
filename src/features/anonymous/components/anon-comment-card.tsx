@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { VoteButtons } from '@/features/votes/components/vote-buttons';
-import { UserX } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { AnonCommentCardProps } from '../types/anon-comment';
+
+const ANON_PROFILE_IMAGE = '/profile_anon.webp';
 
 export function AnonCommentCard({
   comment,
@@ -44,9 +46,10 @@ export function AnonCommentCard({
       />
       <div className="flex-1">
         <div className="flex items-center gap-2 text-sm">
-          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
-            <UserX className="h-3 w-3 text-muted-foreground" />
-          </div>
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={ANON_PROFILE_IMAGE} />
+            <AvatarFallback>A</AvatarFallback>
+          </Avatar>
           <span className="font-medium text-orange-600">
             {comment.isAnonymous || !comment.author ? 'Anonymous' : comment.author.name}
           </span>

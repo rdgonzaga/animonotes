@@ -13,6 +13,7 @@ import { SiteFooter } from '@/components/layout/site-footer';
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 10;
+const ANON_PROFILE_IMAGE = '/profile_anon.webp';
 
 async function getPosts(page = 1, limit = PAGE_SIZE) {
   try {
@@ -177,9 +178,9 @@ export default async function HomePage() {
                   <Link key={post.id} href={`/posts/${post.id}`} className="block group">
                     <div className="flex items-start gap-2">
                       <Avatar className="h-5 w-5 mt-0.5">
-                        <AvatarImage src={post.author?.image || undefined} />
+                        <AvatarImage src={post.author?.image || ANON_PROFILE_IMAGE} />
                         <AvatarFallback className="text-[10px] bg-muted">
-                          {post.author?.name?.charAt(0) || '?'}
+                          {post.author?.name?.charAt(0) || 'A'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
@@ -206,10 +207,10 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Recommended topics */}
+            {/* College categories */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">Recommended topics</CardTitle>
+                <CardTitle className="text-sm font-semibold">College Categories</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-2">
@@ -251,9 +252,9 @@ export default async function HomePage() {
                       >
                         <div className="flex items-start gap-2">
                           <Avatar className="h-5 w-5 mt-0.5">
-                            <AvatarImage src={bookmark.post.author?.image || undefined} />
+                            <AvatarImage src={bookmark.post.author?.image || ANON_PROFILE_IMAGE} />
                             <AvatarFallback className="text-[10px] bg-muted">
-                              {bookmark.post.author?.name?.charAt(0) || '?'}
+                              {bookmark.post.author?.name?.charAt(0) || 'A'}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">

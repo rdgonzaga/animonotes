@@ -10,6 +10,8 @@ import { CategoryBadge } from '@/features/categories/components/category-badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search as SearchIcon, Calendar, Eye, MessageSquare } from 'lucide-react';
 
+const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -97,7 +99,13 @@ export default function SearchPage() {
                                 <span className="text-sm font-semibold">{post.author.name}</span>
                               </>
                             ) : (
-                              <span className="text-sm font-semibold">Anonymous</span>
+                              <>
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={ANON_PROFILE_IMAGE} />
+                                  <AvatarFallback className="text-xs bg-muted">A</AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-semibold">Anonymous</span>
+                              </>
                             )}
                           </div>
                           <Link href={`/posts/${post.id}`}>

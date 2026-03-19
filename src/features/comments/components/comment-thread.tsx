@@ -9,6 +9,8 @@ import { VoteButtons } from '@/features/votes/components/vote-buttons';
 import type { CommentThreadProps } from '../types/comment';
 import { authClient } from '@/lib/auth-client';
 
+const ANON_PROFILE_IMAGE = '/profile_anon.webp';
+
 export function CommentThread({
   comment,
   postId,
@@ -62,7 +64,13 @@ export function CommentThread({
               </Link>
             </>
           ) : (
-            <span className="font-medium text-muted-foreground">Anonymous</span>
+            <>
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={ANON_PROFILE_IMAGE} />
+                <AvatarFallback>A</AvatarFallback>
+              </Avatar>
+              <span className="font-medium text-muted-foreground">Anonymous</span>
+            </>
           )}
           <span className="text-muted-foreground">•</span>
           <span className="text-muted-foreground">
