@@ -10,8 +10,12 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const [isMounted, setIsMounted] = useState(false);
+  const sessionUser = session?.user as Record<string, unknown> | undefined;
   const role = (session?.user as Record<string, unknown> | undefined)?.role as string | undefined;
-  const profileHref = session?.user?.id ? `/profile/${session.user.id}` : '/login';
+  const sessionUsername = typeof sessionUser?.username === 'string' ? sessionUser.username : null;
+  const profileHref = session?.user?.id
+    ? `/profile/${sessionUsername || session.user.id}`
+    : '/login';
 
   useEffect(() => {
     setIsMounted(true);

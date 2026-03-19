@@ -20,6 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         _count: {
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         _count: {

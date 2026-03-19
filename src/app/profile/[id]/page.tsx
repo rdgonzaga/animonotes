@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { prisma } from '@/lib/prisma';
@@ -8,10 +8,13 @@ import { ProfileAcademicDetails } from '@/features/profile/components/profile-ac
 
 export const dynamic = 'force-dynamic';
 
-async function getUser(id: string) {
+async function getUser(identifier: string) {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id },
+    const user = await prisma.user.findFirst({
+      where: {
+        deletedAt: null,
+        OR: [{ id: identifier }, { username: identifier }],
+      },
       select: {
         id: true,
         name: true,
@@ -35,11 +38,11 @@ async function getUser(id: string) {
 
     // Calculate karma
     const userPosts = await prisma.post.findMany({
-      where: { authorId: id },
+      where: { authorId: user.id },
       select: { votes: { select: { value: true } } },
     });
     const userComments = await prisma.comment.findMany({
-      where: { authorId: id },
+      where: { authorId: user.id },
       select: { votes: { select: { value: true } } },
     });
     const karma = [
@@ -59,6 +62,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
   if (!user) {
     notFound();
+  }
+
+  if (user.username && id !== user.username) {
+    redirect(`/profile/${user.username}`);
   }
 
   const canEdit = session?.user?.id === user.id;

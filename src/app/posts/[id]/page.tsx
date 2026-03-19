@@ -24,6 +24,7 @@ async function getPost(id: string) {
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         category: {
@@ -128,7 +129,10 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
                                 {post.author.name?.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <Link href={`/profile/${post.author.id}`} className="hover:underline">
+                            <Link
+                              href={`/profile/${post.author.username || post.author.id}`}
+                              className="hover:underline"
+                            >
                               {post.author.name}
                             </Link>
                           </div>

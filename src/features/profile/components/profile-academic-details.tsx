@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -35,13 +36,23 @@ export function ProfileAcademicDetails({
   initialUsername,
   initialBiography,
 }: ProfileAcademicDetailsProps) {
+  const router = useRouter();
+  const initialUsernameValue = (initialUsername || '').toLowerCase();
   const [college, setCollege] = useState<string>(initialCollege || '');
   const [course, setCourse] = useState<string>(initialCourse || '');
-  const [username, setUsername] = useState<string>(initialUsername || '');
+  const [username, setUsername] = useState<string>(initialUsernameValue);
   const [biography, setBiography] = useState<string>(initialBiography || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState<'unchecked' | 'available' | 'taken'>(
+    initialUsernameValue ? 'available' : 'unchecked'
+  );
+  const [usernameMessage, setUsernameMessage] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const normalizedUsername = username.trim().toLowerCase();
+  const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
 
   const isCollegeValue = (value: string): value is CollegeValue => {
     return COLLEGES.includes(value as CollegeValue);
@@ -52,8 +63,19 @@ export function ProfileAcademicDetails({
     setError('');
     setSuccess('');
 
-    if (!college || !course.trim() || !username.trim()) {
+    if (!college || !course.trim() || !normalizedUsername) {
       setError('College, course, and username are required.');
+      return;
+    }
+
+    if (!usernameRegex.test(normalizedUsername)) {
+      setError('Username must be 3-30 characters and only use letters, numbers, and underscores.');
+      return;
+    }
+
+    const changedUsername = normalizedUsername !== initialUsernameValue;
+    if (changedUsername && usernameStatus !== 'available') {
+      setError('Please check username availability first.');
       return;
     }
 
@@ -66,7 +88,7 @@ export function ProfileAcademicDetails({
         body: JSON.stringify({
           college,
           course: course.trim(),
-          username: username.trim(),
+          username: normalizedUsername,
           biography: biography.trim(),
         }),
       });
@@ -80,10 +102,63 @@ export function ProfileAcademicDetails({
       }
 
       setSuccess('Profile details saved.');
+      setUsernameStatus('available');
+      setUsernameMessage('Username is available.');
+      router.refresh();
+      router.replace(`/profile/${normalizedUsername}`);
     } catch {
       setError('Failed to save profile details');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const checkUsernameAvailability = async () => {
+    setError('');
+    setSuccess('');
+    setUsernameMessage('');
+
+    if (!normalizedUsername) {
+      setUsernameStatus('unchecked');
+      setUsernameMessage('Enter a username first.');
+      return;
+    }
+
+    if (!usernameRegex.test(normalizedUsername)) {
+      setUsernameStatus('taken');
+      setUsernameMessage(
+        'Username must be 3-30 characters and only use letters, numbers, and underscores.'
+      );
+      return;
+    }
+
+    setIsCheckingUsername(true);
+
+    try {
+      const res = await fetch(
+        `/api/users/username-availability?username=${encodeURIComponent(normalizedUsername)}&excludeUserId=${encodeURIComponent(userId)}`,
+        { cache: 'no-store' }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setUsernameStatus('taken');
+        setUsernameMessage(data.message || data.error || 'Unable to check username right now.');
+        return;
+      }
+
+      if (data.available) {
+        setUsernameStatus('available');
+        setUsernameMessage('Username is available.');
+      } else {
+        setUsernameStatus('taken');
+        setUsernameMessage('Username is already taken.');
+      }
+    } catch {
+      setUsernameStatus('taken');
+      setUsernameMessage('Unable to check username right now.');
+    } finally {
+      setIsCheckingUsername(false);
     }
   };
 
@@ -166,13 +241,38 @@ export function ProfileAcademicDetails({
           <div className="space-y-2">
             <Label htmlFor="username">Username *</Label>
             <p className="text-xs text-muted-foreground">Customize your username</p>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="e.g., reniaarr"
-              required
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setUsernameStatus('unchecked');
+                  setUsernameMessage('');
+                }}
+                placeholder="e.g., reniaarr"
+                required
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => void checkUsernameAvailability()}
+                disabled={isCheckingUsername}
+              >
+                {isCheckingUsername ? 'Checking...' : 'Check'}
+              </Button>
+            </div>
+            {usernameMessage && (
+              <p
+                className={`text-xs ${
+                  usernameStatus === 'available'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                }`}
+              >
+                {usernameMessage}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

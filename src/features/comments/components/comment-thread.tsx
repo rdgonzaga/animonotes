@@ -54,7 +54,10 @@ export function CommentThread({
                 <AvatarImage src={comment.author.image || undefined} />
                 <AvatarFallback>{comment.author.name?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <Link href={`/profile/${comment.author.id}`} className="font-medium hover:underline">
+              <Link
+                href={`/profile/${comment.author.username || comment.author.id}`}
+                className="font-medium hover:underline"
+              >
                 {comment.author.name}
               </Link>
             </>

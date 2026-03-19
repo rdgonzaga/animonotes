@@ -13,7 +13,8 @@ const updateProfileSchema = z.object({
     .trim()
     .min(3)
     .max(30)
-    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores')
+    .transform((value) => value.toLowerCase()),
   biography: z.string().trim().max(500).optional().or(z.literal('')),
 });
 
@@ -107,6 +108,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const { college, course, username, biography } = parsed.data;
+
+    const existingUsernameOwner = await prisma.user.findFirst({
+      where: {
+        username: {
+          equals: username,
+          mode: 'insensitive',
+        },
+        NOT: {
+          id,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existingUsernameOwner) {
+      return NextResponse.json({ error: 'Username is already taken' }, { status: 409 });
+    }
 
     try {
       const updatedUser = await prisma.user.update({

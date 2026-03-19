@@ -6,6 +6,7 @@ export interface CommentBase {
     id: string;
     name: string;
     image: string | null;
+    username?: string | null;
   } | null;
   score: number;
   parentId: string | null;

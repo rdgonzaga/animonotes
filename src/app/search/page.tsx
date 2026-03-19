@@ -138,7 +138,7 @@ export default function SearchPage() {
                 {results.users.map((user: any) => (
                   <Card key={user.id} className="group hover:shadow-md transition-all duration-200">
                     <CardContent className="pt-6">
-                      <Link href={`/profile/${user.id}`}>
+                      <Link href={`/profile/${user.username || user.id}`}>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-12 w-12">
                             <AvatarImage src={user.image || undefined} />
