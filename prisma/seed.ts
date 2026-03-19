@@ -4,34 +4,44 @@ const prisma = new PrismaClient();
 
 const CATEGORY_DATA = [
   {
-    name: 'Math',
-    slug: 'math',
-    description: 'Mathematical concepts, problems, and discussions',
+    name: 'BAGCED',
+    slug: 'bagced',
+    description: 'Brother Andrew Gonzalez FSC College of Education',
   },
   {
-    name: 'Science',
-    slug: 'science',
-    description: 'Physics, chemistry, biology, and scientific discoveries',
+    name: 'CCS',
+    slug: 'ccs',
+    description: 'College of Computer Studies',
   },
   {
-    name: 'History',
-    slug: 'history',
-    description: 'Historical events, figures, and analysis',
+    name: 'TDSOL',
+    slug: 'tdsol',
+    description: 'Tañada-Diokno School of Law',
   },
   {
-    name: 'Literature',
-    slug: 'literature',
-    description: 'Books, poetry, writing, and literary analysis',
+    name: 'CLA',
+    slug: 'cla',
+    description: 'College of Liberal Arts',
   },
   {
-    name: 'Languages',
-    slug: 'languages',
-    description: 'Language learning, linguistics, and translation',
+    name: 'COS',
+    slug: 'cos',
+    description: 'College of Science',
   },
   {
-    name: 'General',
-    slug: 'general',
-    description: 'General discussion and off-topic conversations',
+    name: 'GCOE',
+    slug: 'gcoe',
+    description: 'Gokongwei College of Engineering',
+  },
+  {
+    name: 'RVRCOB',
+    slug: 'rvrcob',
+    description: 'Ramon V. del Rosario College of Business',
+  },
+  {
+    name: 'SOE',
+    slug: 'soe',
+    description: 'School of Economics',
   },
 ];
 
