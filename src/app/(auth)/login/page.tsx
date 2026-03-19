@@ -20,7 +20,12 @@ export default function LoginPage() {
   })();
 
   const handleGoogleSignIn = () => {
-    authClient.signIn.social({ provider: 'google' });
+    authClient.signIn.social({
+      provider: 'google',
+      callbackURL: '/',
+      newUserCallbackURL: '/',
+      errorCallbackURL: '/login?error=Only%20%40dlsu.edu.ph%20emails%20are%20allowed.',
+    });
   };
 
   const features = [

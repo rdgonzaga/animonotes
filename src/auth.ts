@@ -2,7 +2,6 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { prisma } from '@/lib/prisma';
-import { APIError } from 'better-auth/api';
 
 const baseURL = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
 
@@ -19,6 +18,8 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      accessType: 'online',
+      hd: 'dlsu.edu.ph',
       prompt: 'select_account',
       allowedDomains: ['dlsu.edu.ph'],
     },
@@ -33,6 +34,11 @@ export const auth = betterAuth({
     },
   },
   account: {
+    accountLinking: {
+      enabled: true,
+      disableImplicitLinking: false,
+      trustedProviders: ['google'],
+    },
     fields: {
       providerId: 'provider',
       accountId: 'providerAccountId',
@@ -50,21 +56,6 @@ export const auth = betterAuth({
       expiresAt: 'expires',
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // 1 day
-    },
-  },
-  databaseHooks: {
-    user: {
-      create: {
-        before: async (user) => {
-          const email = user.email?.toLowerCase() ?? '';
-          if (!email.endsWith('@dlsu.edu.ph')) {
-            throw new APIError('FORBIDDEN', {
-              message: 'Only @dlsu.edu.ph emails are allowed.',
-            });
-          }
-          return { data: user };
-        },
-      },
     },
   },
   plugins: [nextCookies()],

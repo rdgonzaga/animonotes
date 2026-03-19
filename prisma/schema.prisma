@@ -19,7 +19,7 @@ model User {
   name              String?
   image             String?
   role              String    @default("user") // user, moderator, admin
-  emailVerified     DateTime?
+  emailVerified     Boolean   @default(false)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @default(now()) @updatedAt
   deletedAt         DateTime? // Soft delete
@@ -78,6 +78,18 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  @@index([identifier])
+  @@index([expiresAt])
 }
 
 // ==================== Content Models ====================

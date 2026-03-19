@@ -151,6 +151,7 @@ async function resetData() {
     prisma.tag.deleteMany(),
     prisma.post.deleteMany(),
     prisma.category.deleteMany(),
+    prisma.verification.deleteMany(),
     prisma.session.deleteMany(),
     prisma.account.deleteMany(),
     prisma.user.deleteMany(),
@@ -173,27 +174,14 @@ async function main() {
   }) => {
     const email = data.email.toLowerCase();
 
-    return prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          email,
-          name: data.name,
-          image: data.image,
-          role: data.role,
-          emailVerified: new Date(),
-        },
-      });
-
-      await tx.account.create({
-        data: {
-          userId: user.id,
-          type: 'oauth',
-          provider: 'google',
-          providerAccountId: `google-${email}`,
-        },
-      });
-
-      return user;
+    return prisma.user.create({
+      data: {
+        email,
+        name: data.name,
+        image: data.image,
+        role: data.role,
+        emailVerified: true,
+      },
     });
   };
 
