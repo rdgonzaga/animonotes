@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/features/auth/lib/auth';
+import { z } from 'zod';
+
+const COLLEGES = ['BAGCED', 'CCS', 'TDSOL', 'CLA', 'COS', 'GCOE', 'COB', 'SOE'] as const;
+
+const updateProfileSchema = z.object({
+  college: z.enum(COLLEGES),
+  course: z.string().trim().min(1).max(200),
+  username: z
+    .string()
+    .trim()
+    .min(3)
+    .max(30)
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  biography: z.string().trim().max(500).optional().or(z.literal('')),
+});
 
 // GET /api/users/[id] - Get user profile
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -12,6 +27,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         id: true,
         name: true,
         image: true,
+        username: true,
+        college: true,
+        course: true,
+        biography: true,
         createdAt: true,
         _count: {
           select: {
@@ -78,77 +97,53 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const body = await request.json();
-    const { name, image } = body;
+    const parsed = updateProfileSchema.safeParse(body);
 
-    const updatedUser = await prisma.user.update({
-      where: { id: id },
-      data: {
-        ...(name && { name }),
-        ...(image && { image }),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-      },
-    });
-
-    return NextResponse.json(updatedUser);
-  } catch (error) {
-    console.error('User update error:', error);
-    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
-  }
-}
-
-// DELETE /api/users/[id] - Soft delete user account
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
-
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    if (session.user.id !== id) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Forbidden - can only delete own account' },
-        { status: 403 }
+        { error: 'Validation failed', details: parsed.error.issues },
+        { status: 400 }
       );
     }
 
-    // Soft delete user
-    await prisma.user.update({
-      where: { id: id },
-      data: {
-        deletedAt: new Date(),
-        email: `deleted_${id}@deleted.com`, // Anonymize email
-        name: '[Deleted User]',
-        image: null,
-      },
-    });
+    const { college, course, username, biography } = parsed.data;
 
-    // Anonymize posts (keep content, remove author link)
-    await prisma.post.updateMany({
-      where: { authorId: id },
-      data: { authorId: null },
-    });
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: id },
+        data: {
+          college,
+          course,
+          username,
+          biography: biography || null,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          username: true,
+          college: true,
+          course: true,
+          biography: true,
+        },
+      });
 
-    // Anonymize comments (keep content, remove author link)
-    await prisma.comment.updateMany({
-      where: { authorId: id },
-      data: { authorId: null },
-    });
+      return NextResponse.json(updatedUser);
+    } catch (error) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'P2002'
+      ) {
+        return NextResponse.json({ error: 'Username is already taken' }, { status: 409 });
+      }
 
-    return NextResponse.json({ message: 'Account deleted successfully' });
+      throw error;
+    }
   } catch (error) {
-    console.error('User deletion error:', error);
-    return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 });
+    console.error('User update error:', error);
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
