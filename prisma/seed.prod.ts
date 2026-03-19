@@ -38,7 +38,6 @@ function assertSeedTargetsRuntimeDatabase() {
 
     const isSameDatabase =
       runtimeIdentity.host === directIdentity.host &&
-      runtimeIdentity.port === directIdentity.port &&
       runtimeIdentity.database === directIdentity.database;
 
     if (!isSameDatabase) {
@@ -48,6 +47,18 @@ function assertSeedTargetsRuntimeDatabase() {
           `DATABASE_URL => ${runtimeIdentity.host}:${runtimeIdentity.port}/${runtimeIdentity.database}`,
           `DIRECT_URL => ${directIdentity.host}:${directIdentity.port}/${directIdentity.database}`,
           'Seed aborted to avoid writing data into a different database than the app runtime.',
+        ].join(' ')
+      );
+    }
+
+    if (runtimeIdentity.port !== directIdentity.port) {
+      console.warn(
+        [
+          'DATABASE_URL and DIRECT_URL use different ports.',
+          `DATABASE_URL => ${runtimeIdentity.host}:${runtimeIdentity.port}/${runtimeIdentity.database}`,
+          `DIRECT_URL => ${directIdentity.host}:${directIdentity.port}/${directIdentity.database}`,
+          'This is expected on providers like Supabase (pooler vs direct).',
+          'Seeding continues using DATABASE_URL to match app runtime.',
         ].join(' ')
       );
     }
