@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -36,8 +35,6 @@ const CATEGORY_DATA = [
   },
 ];
 
-const USER_NAMES = ['Duncan Marcaida', 'Elkan La Madrid', 'Mariel Yasumuro', 'Rainer Gonzaga'];
-
 const TITLE_SNIPPETS = [
   'Study tips for finals week',
   'Quick notes on {topic}',
@@ -73,6 +70,34 @@ const PROFILE_IMAGES = [
   '/dummy_icons/profile4.jpg',
   '/dummy_icons/profile5.jpg',
 ];
+
+const SEEDED_USERS = [
+  {
+    email: 'test@dlsu.edu.ph',
+    name: 'Raikan Joriel Yasgonlarcaida',
+    image: PROFILE_IMAGES[0],
+  },
+  {
+    email: 'duncan.marcaida@dlsu.edu.ph',
+    name: 'Duncan Marcaida',
+    image: PROFILE_IMAGES[1],
+  },
+  {
+    email: 'elkan.lamadrid@dlsu.edu.ph',
+    name: 'Elkan La Madrid',
+    image: PROFILE_IMAGES[2],
+  },
+  {
+    email: 'mariel.yasumuro@dlsu.edu.ph',
+    name: 'Mariel Yasumuro',
+    image: PROFILE_IMAGES[3],
+  },
+  {
+    email: 'rainer_gonzaga@dlsu.edu.ph',
+    name: 'Rainer Gonzaga',
+    image: PROFILE_IMAGES[4],
+  },
+] as const;
 
 const POST_IMAGES = [
   '/dummy_mainpic/comsci.jpg',
@@ -138,9 +163,6 @@ async function main() {
   console.log('🧹 Resetting existing data...');
   await resetData();
 
-  const hashedPassword = await bcrypt.hash('password123', 10);
-  const hashedAnswer = await bcrypt.hash('tokyo', 10);
-
   const users = [] as { id: string; name: string | null }[];
 
   const createSeedUser = async (data: {
@@ -157,20 +179,17 @@ async function main() {
           email,
           name: data.name,
           image: data.image,
-          password: hashedPassword,
-          securityQuestion: 'What is your favorite city?',
-          securityAnswer: hashedAnswer,
           role: data.role,
+          emailVerified: new Date(),
         },
       });
 
       await tx.account.create({
         data: {
           userId: user.id,
-          type: 'credentials',
-          provider: 'credential',
-          providerAccountId: email,
-          password: hashedPassword,
+          type: 'oauth',
+          provider: 'google',
+          providerAccountId: `google-${email}`,
         },
       });
 
@@ -178,22 +197,12 @@ async function main() {
     });
   };
 
-  const testUser = await createSeedUser({
-    email: 'test@animonotes.app',
-    name: 'Raikan Joriel Yasgonlarcaida',
-    image: PROFILE_IMAGES[0],
-    role: 'user',
-  });
-  users.push({ id: testUser.id, name: testUser.name });
-
-  for (let i = 0; i < USER_NAMES.length; i += 1) {
-    const name = USER_NAMES[i];
-    const email = `user${i + 1}@animonotes.app`;
+  for (const seededUser of SEEDED_USERS) {
     const user = await createSeedUser({
-      email,
-      image: PROFILE_IMAGES[i],
-      name,
-      role: 'user',
+      email: seededUser.email,
+      image: seededUser.image,
+      name: seededUser.name,
+      role: seededUser.email === 'rainer_gonzaga@dlsu.edu.ph' ? 'admin' : 'user',
     });
     users.push({ id: user.id, name: user.name });
   }
