@@ -73,29 +73,28 @@ const PROFILE_IMAGES = [
 
 const SEEDED_USERS = [
   {
-    email: 'test@dlsu.edu.ph',
-    name: 'Raikan Joriel Yasgonlarcaida',
+    email: 'rainer_gonzaga@dlsu.edu.ph',
+    name: 'Rainer Gonzaga',
+    username: 'rgonzaga',
     image: PROFILE_IMAGES[0],
   },
   {
-    email: 'duncan.marcaida@dlsu.edu.ph',
-    name: 'Duncan Marcaida',
+    email: 'duncan_marcaida@dlsu.edu.ph',
+    name: 'Duncan Joseph Marcaida',
+    username: 'djmarcaida',
     image: PROFILE_IMAGES[1],
   },
   {
-    email: 'elkan.lamadrid@dlsu.edu.ph',
+    email: 'elkan_lamadrid@dlsu.edu.ph',
     name: 'Elkan La Madrid',
+    username: 'elamadrid',
     image: PROFILE_IMAGES[2],
   },
   {
-    email: 'mariel.yasumuro@dlsu.edu.ph',
+    email: 'mariel_yasumuro@dlsu.edu.ph',
     name: 'Mariel Yasumuro',
+    username: 'myasumuro',
     image: PROFILE_IMAGES[3],
-  },
-  {
-    email: 'rainer_gonzaga@dlsu.edu.ph',
-    name: 'Rainer Gonzaga',
-    image: PROFILE_IMAGES[4],
   },
 ] as const;
 
@@ -169,6 +168,7 @@ async function main() {
   const createSeedUser = async (data: {
     email: string;
     name: string;
+    username: string;
     image: string;
     role: 'user' | 'moderator' | 'admin';
   }) => {
@@ -178,6 +178,7 @@ async function main() {
       data: {
         email,
         name: data.name,
+        username: data.username,
         image: data.image,
         role: data.role,
         emailVerified: true,
@@ -190,6 +191,7 @@ async function main() {
       email: seededUser.email,
       image: seededUser.image,
       name: seededUser.name,
+      username: seededUser.username,
       role: seededUser.email === 'rainer_gonzaga@dlsu.edu.ph' ? 'admin' : 'user',
     });
     users.push({ id: user.id, name: user.name });
@@ -285,10 +287,10 @@ async function main() {
 
   // Create or update a moderator user from existing DLSU-seeded users.
   const moderatorUser = await prisma.user.update({
-    where: { email: 'duncan.marcaida@dlsu.edu.ph' },
+    where: { email: 'duncan_marcaida@dlsu.edu.ph' },
     data: { role: 'moderator' },
   });
-  console.log('✓ Set duncan.marcaida@dlsu.edu.ph as moderator');
+  console.log('✓ Set duncan_marcaida@dlsu.edu.ph as moderator');
 
   // Get some posts for reports
   const reportPosts = await prisma.post.findMany({ take: 3, where: { deletedAt: null } });
