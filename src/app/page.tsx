@@ -8,6 +8,7 @@ import { getServerSession } from '@/lib/session';
 import { HeroSlider } from '@/features/home/components/hero-slider';
 import { Sidebar } from '@/components/layout/sidebar';
 import { InfinitePostFeed } from '@/features/posts/components/infinite-post-feed';
+import { SiteFooter } from '@/components/layout/site-footer';
 
 export const dynamic = 'force-dynamic';
 
@@ -140,24 +141,31 @@ export default async function HomePage() {
 
       {/* Main Content: 3-column layout */}
       <div className="max-w-7xl mx-auto w-full px-4 py-6">
-        <div className="flex gap-6">
+        <div className="flex gap-6 items-start">
           {/* Left Sidebar — Desktop only */}
-          <Sidebar />
+          <div className="hidden lg:flex w-44 xl:w-48 shrink-0 flex-col sticky top-6 self-start max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pr-1">
+            <Sidebar />
+            <SiteFooter compact />
+          </div>
 
           {/* Main Feed */}
-          <main className="flex-1 min-w-0">
+          <main
+            id="home-feed-scroll"
+            className="flex-1 min-w-0 max-h-[calc(100vh-8rem)] overflow-y-auto pr-1 no-scrollbar"
+          >
             <div className="max-w-4xl mx-auto">
               <InfinitePostFeed
                 initialPosts={serializedPosts}
                 initialPage={pagination.page}
                 totalPages={pagination.totalPages}
                 limit={pagination.limit}
+                observerRootId="home-feed-scroll"
               />
             </div>
           </main>
 
           {/* Right Sidebar — Desktop only */}
-          <aside className="hidden xl:flex flex-col gap-5 w-72 shrink-0">
+          <aside className="hidden xl:flex flex-col gap-5 w-72 shrink-0 sticky top-6 self-start max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pr-1">
             {/* Recently visited */}
             <Card>
               <CardHeader className="pb-2 flex-row items-center justify-between">

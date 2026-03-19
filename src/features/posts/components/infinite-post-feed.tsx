@@ -8,6 +8,7 @@ interface InfinitePostFeedProps {
   initialPage: number;
   totalPages: number;
   limit: number;
+  observerRootId?: string;
 }
 
 interface PostsResponse {
@@ -25,6 +26,7 @@ export function InfinitePostFeed({
   initialPage,
   totalPages,
   limit,
+  observerRootId,
 }: InfinitePostFeedProps) {
   const [posts, setPosts] = useState<any[]>(initialPosts);
   const [page, setPage] = useState(initialPage);
@@ -77,6 +79,8 @@ export function InfinitePostFeed({
       return;
     }
 
+    const observerRoot = observerRootId ? document.getElementById(observerRootId) : null;
+
     const observer = new IntersectionObserver(
       (entries) => {
         const firstEntry = entries[0];
@@ -85,8 +89,8 @@ export function InfinitePostFeed({
         }
       },
       {
-        root: null,
-        rootMargin: '600px 0px',
+        root: observerRoot,
+        rootMargin: '300px 0px',
         threshold: 0,
       }
     );
@@ -96,7 +100,7 @@ export function InfinitePostFeed({
     return () => {
       observer.disconnect();
     };
-  }, [hasMore, loadNextPage]);
+  }, [hasMore, loadNextPage, observerRootId]);
 
   return (
     <div className="space-y-4">
